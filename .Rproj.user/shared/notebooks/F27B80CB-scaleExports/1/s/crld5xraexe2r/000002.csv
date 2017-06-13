@@ -1,0 +1,14 @@
+"0","```r
+countryPred <- full_join(
+                x = countryActual,
+                y = data.frame(month = seq.Date(from = min(countryActual$month), 
+                                                by = \"month\", 
+                                                length.out = 12))
+            ) %>% 
+                # Replace NAs in the cropMonth & cropYear columns
+                mutate(cropMonth = month(month),
+                       cropYear = zoo::na.locf(cropYear))
+
+```"
+"1","Joining, by = \"month\"
+"

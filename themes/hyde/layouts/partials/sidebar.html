@@ -1,0 +1,25 @@
+<div class="col-lg-3 sidebar">
+  <div class = "col sidebar-nav">
+
+      <a href="{{ .Site.BaseURL }}"><h1>{{ .Site.Title }}</h1></a>
+
+      <p>{{ with .Site.Params.description }} {{.}} {{ else }}{{end}}</p>
+
+      <ul>
+        <li><a href = "/" class = "sidebar-link">Home</a></li>
+        <li><a href = "/about" class = "sidebar-link">About</a></li>
+      <!-- Add the Archives link once there are some posts! -->
+      <!-- <li><a href = "/post" class = "sidebar-link">Archive</a></li> -->
+        <li class = "iconLink">
+          <a href="https://twitter.com/tomcopple" target = "_blank">
+            <i class="fa fa-twitter fa-2x" aria-hidden="true"></i></a>
+          <a href="https://www.linkedin.com/in/tom-copple-69a77223?" target = "_blank">
+            <i class="fa fa-linkedin fa-2x" aria-hidden="true"></i></a>
+          <a href="https://github.com/tomcopple" target = "_blank">
+            <i class="fa fa-github fa-2x" aria-hidden="true"></i></a>
+          </li>
+      </ul>
+
+    <p>&copy; {{ now.Format "2006"}}</p>
+  </div>
+</div>

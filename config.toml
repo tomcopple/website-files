@@ -1,0 +1,36 @@
+baseurl = "http://tomcopple.coffee/"
+relativeurls = true
+languageCode = "en-us"
+buildDrafts = false
+title = "Coffee & Datasets"
+theme = "hyde"
+googleAnalytics = "UA-90543781-1"
+disqusShortname = ""
+ignoreFiles = ["_files$", "_cache$"]
+disableKinds = "RSS"
+
+[permalinks]
+    post = "/:year/:month/:day/:slug/"
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[blackfriday]
+    hrefTargetBlank = true
+
+[params]
+    description = "A personal blog."
+    themeColor = "theme-base-0d"
+    layoutReverse = false
+
+    # options for highlight.js (version, additional languages, and theme)
+    highlightjsVersion = "9.9.0"
+    highlightjsLang = ["r", "yaml"]
+    highlightjsTheme = "github"
+
+    [params.logo]
+    url = "logo.png"
+    width = 50
+    height = 50
+    alt = "Logo"

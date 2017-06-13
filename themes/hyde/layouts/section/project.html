@@ -1,0 +1,31 @@
+{{ partial "head.html" . }}
+<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+  <div class = "container-fluid">
+    <div class = "row">
+      {{ partial "sidebar.html" . }}
+
+      <div class="col-lg-8 offset-lg-3 post">
+        <h1>{{ .Title }}<h1>
+
+        {{ range .Data.Pages }}
+          <h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
+          <div class = 'media'>
+            <div class = 'media-body'>
+              <p class = 'post-date'><em>{{ .Date.Format "Jan 2006" }}</em></p>
+              {{ with .Params.description }} <p>{{ . }}</p> {{ end }}
+            </div>
+
+            {{ if isset .Params "thumbnail" }}
+            <a href = "{{ .Permalink }}">
+              <img src = "/img/thumbnails/{{ .Params.thumbnail }}" alt = "">
+            </a>
+            {{ else }}
+            <p>No picture found here :(</p>
+            {{ end }}
+          </div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+"0","splitLoess <- exports %>%
+    group_by(country) %>%
+    mutate(monthNum = as.numeric(monthFac)) %>%
+    nest() %>%
+    mutate(fit = purrr::map(data, getLoess),
+           fit = purrr::map(fit, select, -monthNum)) %>%
+    unnest() %>%
+    select(country, monthFac, volume, .fitted, .se.fit) %>%
+    group_by(country, monthFac) %>%
+    mutate(mean = mean(volume)/1000000,
+           .fitted = .fitted/1000000,
+           .se.fit = .se.fit/1000000) %>%
+    ungroup() %>%
+    distinct(country, monthFac, mean, .fitted, .se.fit)
+"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"
+"2","Deprecated: please use `purrr::possibly()` instead"

@@ -1,0 +1,22 @@
+"0","pYieldData <- read_csv(file.path(coffeestats, ""input/faostat.csv"")) %>%
+    select(country = Area, year = Year, value = Value) %>%
+    # Fix spelling
+    mutate(country = ifelse(grepl(""Viet Nam"", country), ""Vietnam"", country)) %>%
+    # Make sure it's the most recent year
+    group_by(country) %>% top_n(n = 1, wt = year) %>% ungroup() %>%
+    # Get top 10 producers; make into factor for plot, fix units
+    filter(country %in% top10) %>%
+    mutate(country = forcats::fct_reorder(country, value),
+           value = value/10)
+"
+"2","Parsed with column specification:
+cols(
+  Domain = col_character(),
+  Area = col_character(),
+  Element = col_character(),
+  Item = col_character(),
+  Year = col_integer(),
+  Unit = col_character(),
+  Value = col_integer()
+)
+"

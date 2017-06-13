@@ -1,0 +1,6 @@
+"0","devMap <- full_join(
+    data_frame(country = worldMap$NAME), 
+    wbGroups)
+"
+"2","Joining, by = ""country""
+"

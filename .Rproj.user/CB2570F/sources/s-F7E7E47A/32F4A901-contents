@@ -1,0 +1,774 @@
+---
+title: "Can Vietnam become the world's largest coffee exporter?"
+output: html_notebook
+---
+
+```{r, include = FALSE, message = F, warning = F}
+coffeestats <- "/Dropbox/Work/coffeestats"
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90")
+project <- "~/Dropbox/Work/coffeestats/projects/canCoffeeOvertake"
+source("~/R/tomcopple.github.io/scripts/theme_blog.R")
+knitr::opts_chunk$set(message = F, warning = F, error = F)
+library(tidyverse);library(lubridate);library(plotly)
+library(tabulizer);library(pdftools);library(stringr);library(magrittr)
+```
+
+## Text
+
+### Introduction
+
+In March of this year, Vietnam made headlines in the coffee industry by exporting more coffee than Brazil.  
+
+![](/Users/tomcopple/Dropbox/Work/coffeestats/projects/canCoffeeOvertake/input/vnHeadlinesCollage.png)
+
+
+This isn't the first time this has happened, but it's still surprising. Brazil is by far and away the largest coffee producer in the world, accounting for around a third of world production, while Vietnam generally produces about half as much. But Brazil also consumes a significant amount of coffee, in fact it's the second largest coffee consumer worldwide after the USA. This means that around 40% of the crop never leaves the country. In Vietnam, on other hand, while local consumption is generally increasing, it still only accounts for less than 10% of the total. 
+
+At the same time, a severe drought in parts of Brazil has reduced their Robusta output over the last couple of years. Robusta is the preferred bean for the domestic Brazilian market, and also happens to be the main variety grown in Vietnam. This has led to a fierce political debate in Brazil over whether or not to accept Robusta imports from Vietnam to supply the local market. 
+
+While Vietnam might not be about to overtake Brazil in terms of production any time soon, it's clear that the dynamics between the two are of increasing importance to the coffee industry, and its future sustainability. 
+
+### Context
+
+Before reading too much into the latest headlines, it's important to consider the context of these export figures. Brazil and Vietnam have very different crop cycles: Vietnam starts its yearly harvest in October, and starts shipping in earnest around six months later. In Brazil, the year starts in April (or July in some cases), so by March shipments have pretty much dried up. This can be seen in the graph below, which shows average monthly exports by both countries over the last five years. 
+
+```{r, echo = FALSE, fig.height=4, fig.width=7}
+# NB Requires data from later on, so might need to be run afterwards. 
+bind_rows(vnFinal, br) %>% 
+    filter(date >= "2012-10-01") %>% 
+    mutate(year = ifelse(month(date) == 10, year(date), NA),
+           year = zoo::na.locf(year),
+           month = ordered(month(date), levels = c(10:12, 1:9), labels = month.abb[c(10:12, 1:9)])) %>% 
+    group_by(country, month) %>% 
+    summarise(mean = mean(volume)) %>% 
+    ungroup() %>% 
+    ggplot(aes(x = month, group = country)) +
+    geom_point(aes(y = mean/1000000, color = country)) +
+    stat_smooth(data = bind_rows(vnFinal, br) %>% 
+                    filter(date >= "2012-10-01") %>% 
+                    mutate(month = ordered(month(date), levels = c(10:12, 1:9), 
+                                           labels = month.abb[c(10:12, 1:9)])), 
+                aes(y = volume/1000000, color = country, fill = country), 
+                span = 8,
+                se = TRUE, alpha = 0.2) +
+    scale_color_manual("", values = blogColours) +
+    scale_fill_manual("", values = blogColours) +
+    theme_blog() +
+    scale_y_blog() +
+    labs(title = "Crop cycles of Vietnam and Brazil",
+         x = NULL, y = "Monthly export volumes \n(million 60kg bags)")
+```
+
+The two countries follow diametrically opposite crop cycles over the course of the year, so it's not a huge shock that Vietnam does occasionally exceed Brazil between February and April. 
+
+That said, the export numbers are surprisingly close given the disparity in size between the two countries. Coffee is synonymous with Brazil, and has been for a very long time, whereas Vietnam is not generally one of the first countries you might associate with coffee compared to, say, Colombia, Ethiopia or Costa Rica. 
+
+Nevertheless, Vietnam is the second largest coffee producing country in the world, by some margin, and the single largest source of Robusta coffee. 
+
+To see how we got here, and how these trends might develop in the future, it's useful to go back and look at the history in a little detail. 
+
+### History
+
+Brazil has been the largest coffee producer in the world since the ICO's records began in the 1960s, but Vietnam is a very different story. It only really started producing coffee in significant quantities in the early 1990s, and has grown since then to become the second largest producer of coffee in the world, and the single most important origin of Robusta coffee. 
+
+```{r, echo = FALSE, fig.height=4, fig.width=7}
+source(file.path(coffeestats, "scripts/getProduction.R"))
+getProduction()
+prodAll %>% 
+    mutate(countryFac = forcats::fct_other(Country, keep = c("Brazil", "Vietnam"), other_level = "Others"),
+           year = dmy(paste0("01-01", year))) %>% 
+    ggplot(aes(x = year, y = value/1000, group = Country, color = countryFac, size = countryFac, alpha = countryFac)) +
+    geom_line() +
+    scale_color_manual("", values = blogColours) +
+    scale_size_manual("", values = c(1, 1, 0.5)) +
+    scale_alpha_manual("", values = c(1, 1, 0.5)) +
+    theme_blog() +
+    theme(legend.key = element_blank()) +
+    scale_y_blog() +
+    labs(title = "Historical world production", x = NULL, y = "Million 60kg bags")
+```
+
+### Consolidation
+
+Between them, Brazil and Vietnam now account for over 50% of world production, up from a third 20 years ago, and this market share is increasing. They have consolidated these leading positions in the coffee market by achieving some of the highest levels of productivity in the sector. 
+
+According to data from the FAO, Vietnam records yields of nearly 2.5 tonnes per hectare, while Brazil averages around 1.4 tonnes, with no other major producing country coming close, as can be seen in the graph below. 
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# FAO Graph: faostat.csv in input folder. 
+yieldData <- read_csv(file.path(coffeestats, "input/faostat.csv")) %>% 
+    select(country = Area, year = Year, value = Value) %>% 
+    mutate(country = ifelse(grepl("Viet Nam", country), "Vietnam", country))
+top10 <- prodAll %>% group_by(Country) %>% top_n(n = 1, wt = year) %>% ungroup() %>% top_n(n = 10, wt = value) %>% magrittr::extract2('Country')
+plotYields <- yieldData %>% 
+    group_by(country) %>% 
+    top_n(n = 1, wt = year) %>% 
+    ungroup() %>% 
+    filter(country %in% top10) %>% 
+    mutate(country = forcats::fct_reorder(country, value),
+           value = value/10)
+ggplot(plotYields, aes(x = country, y = value)) +
+    geom_bar(stat = "identity", position = "dodge",
+             fill = c(rep(blogColours[3], 8),  blogColours[1], blogColours[2])) +
+    geom_label(aes(label = format(value, digits = 1, big.mark = ",")),
+               fill = "#FFFFFF") +
+    coord_flip() +
+    theme_blog() +
+    scale_y_blog() +
+    theme(panel.grid.major.x = element_line(
+        color = '#EEEEEE',
+        # linetype = 'dotted',
+        size = 0.3),
+        panel.grid.major.y = element_blank()) +
+    labs(title = "Coffee yields in major producing countries", 
+         y = "kg / ha", x = NULL)
+
+plot_ly(plotYields, x = ~value, y = ~country, type = "bar", orientation = "h", color = ~country,
+        marker = list(color = c(rep(blogColours[3], 8), blogColours[1], blogColours[2])), text = ~paste0(country, ": ", format(value, digits = 1, big.mark = ","), "kg/ha"), hoverinfo = "text") %>% 
+    layout(title = "Coffee yields by country",
+           xaxis = list(title = "(kg/ha)", zeroline = FALSE, separatethousands = TRUE),
+           yaxis = list(title = "", showline = FALSE),
+           font  = list(family = "sans-serif", color = "#515151"),
+           showlegend = FALSE)
+```
+
+In Brazil, these high yields are achieved because much of the farming is centred on larger estate farms, with relatively high levels of mechanisation. Coffee farms in Brazil are generally less mountainous, which means that the coffee can be picked by machines rather than by hand, which is more time-consuming. 
+
+In Vietnam, on other hand, the strong productivity is a result of heavy use of irrigation and fertilisers, along with relatively low input costs. 
+
+*  Consequences: increasing consolidation in the market increases risk and volatility; squeezing out other origins. 
+*  Though potential for growth from other origins? But requires investment, market price, etc; 
+*  El Salvador - disappearing for good?
+
+### Recent trends
+
+While Brazil and Vietnam account for an increasing share of the coffee market, their future expansion might be more limited. In the last few years, both countries have been hit by severe droughts which have curtailed output growth. In Brazil, lower production in Espirito Santo, the main Robusta-producing region, has led to an internal debate over whether or not to allow imports from Vietnam in order to supply the local market; this would have been unthinkable in previous years. 
+
+```{r}
+prodAll %>% 
+    filter(Country %in% c("Brazil", "Vietnam"), year > "2000") %>% 
+    mutate(year = lubridate::dmy(paste0("01-01-", year))) %>% 
+    ggplot(aes(x = year, y = value/1000, group = Country, fill = Country, color = Country)) +
+    geom_col(alpha = 0.5) +
+    geom_smooth(se = FALSE) +
+    facet_wrap(~Country, scales = "free") +
+    scale_fill_manual(values = blogColours) +
+    scale_color_manual(values = blogColours) +
+    theme_blog() +
+    scale_y_blog() +
+    labs(x = NULL, y = "Million 60kg bags", 
+         title = "Production by Brazil and Vietnam since 2000") +
+    theme(legend.position = "none")
+
+pBr <- plot_ly(prodAll %>% 
+                   filter(Country == "Brazil", year >= "2000") %>% 
+                   mutate(year = lubridate::dmy(paste0("01-01-", year))),
+               x = ~ year, y = ~value/1000) %>% 
+    add_trace(type = "bar", marker = list(color = blogColours[1]), opacity = 0.5,
+              text = ~paste0("(", lubridate::year(year), ") ", round(value/1000, 1), "m bags"),
+              hoverinfo = "text") %>% 
+    add_trace(type = "scatter", mode = "lines", line = list(color = blogColours[1]), hoverinfo = "none",
+              y = ~(fitted(loess(value~year, data = prodAll %>% filter(Country == "Brazil", year >= "2000")))/1000)) %>% 
+    layout(yaxis = list(zeroline = FALSE))
+pVn <- plot_ly(prodAll %>% 
+                   filter(Country == "Vietnam", year >= "2000") %>% 
+                   mutate(year = lubridate::dmy(paste0("01-01-", year))),
+               x = ~year, y = ~value/1000) %>% 
+    add_trace(type = "bar", marker = list(color = blogColours[2]), opacity = 0.5,
+              text = ~paste0("(", lubridate::year(year), ") ", round(value/1000, 1), "m bags"),
+              hoverinfo = "text") %>% 
+    add_trace(type = "scatter", mode = "lines", line = list(color = blogColours[2]), hoverinfo = "none",
+              y = ~(fitted(loess(value~year, data = prodAll %>% 
+                                     filter(Country == "Vietnam", year >= "2000")))/1000)) %>% 
+    layout(yaxis = list(zeroline = FALSE))
+pBrVn <- subplot(pBr, pVn, shareY = FALSE, shareX = FALSE, titleY = FALSE) %>% 
+    layout(showlegend = FALSE,
+           yaxis = list(title="Million 60kg bags", zeroline = FALSE),
+           xaxis = list(title="", zeroline = FALSE),
+           margin = list(b = 20))
+pBrVn
+```
+
+In Vietnam, the industry is further squeezed by the fact that coffee trees generally have an optimal lifespan of around 25 years. Much of Vietnam's coffee area was planted in the early 1990s, which means that many of the trees are reaching the end of their productive capacity. Simply maintaining current output volumes will require significant investment in replanting and regeneration. 
+
+These recent developments show the implicit dangers of consolidation; the more the market depends on output from a small number of countries, the riskier the supply situation is, as poor harvest from Brazil or Vietnam can have major consequences for the international market, much more than any other individual country. 
+
+Given this concern, are there any other countries that could step in to help quench the world's growing thirst for coffee?
+
+### The battle for third place
+
+While Brazil and Vietnam are in a league of their own when it comes to coffee exports, there is another interesting tussle between the third and fourth placed producers - Colombia and Indonesia. Like Brazil, both have a strong historical association with coffee (Juan Valdez, Java); between them, they produce around 25 million bags, or a sixth of the world total. 
+
+Both countries have had ups and downs recently. In Colombia, an outbreak of coffee leaf rust and abnormally heavy rains devastated production between 2008 and 2012 (see below). Only a huge financial investment from the national coffee authority, the *Federacion Nacional de Cafeteros*, enabled Colombia to recover and even exceed its previous output levels. Production has now increased for the last 4 consecutive years, and could hit a 24-year high in 2017. If this resurgence continues, Colombia could potentially produce 20 million bags by 2020, though this would still be well short of Vietnam's current level. 
+
+In Indonesia, on the other hand, while output has generally been increasing, the rapidly expanding local market has reduced the amount of coffee available for export. Indonesia has one of the world's highest growth rates for coffee consumption, at nearly 5% per annum, and the local market now accounts for nearly 50% of production. Some local officials have even expressed concern that Indonesia could become a [net importer of coffee by 2020](http://www.thejakartapost.com/news/2015/12/14/trouble-brewing-indonesia-coffee-industry.html). 
+```{r}
+# Use ICO historical data tables for production and consumption
+# Prod: http://www.ico.org/historical/1990%20onwards/Excel/1a%20-%20Total%20production.xlsx
+# Cons: http://www.ico.org/historical/1990%20onwards/Excel/1b%20-%20Domestic%20consumption.xlsx
+library(readxl)
+if(!(file.exists(file.path(project, "input", "prod.xlsx"))) | 
+   !(file.exists(file.path(project, "input", "cons.xlsx")))) {
+    download.file(
+        url = c(
+            "http://www.ico.org/historical/1990%20onwards/Excel/1a%20-%20Total%20production.xlsx",
+            "http://www.ico.org/historical/1990%20onwards/Excel/1b%20-%20Domestic%20consumption.xlsx"
+        ),
+        destfile = c(
+            file.path(project, "input", "prod.xlsx"),
+            file.path(project, "input", "cons.xlsx")
+        )
+    )
+}
+
+allProdCon <- c(file.path(project, "input", "prod.xlsx"), file.path(project, "input", "cons.xlsx")) %>% 
+    map(read_excel, sheet = 1, col_names = TRUE, skip = 3) %>% 
+    map(select, -2) %>% 
+    map(gather, -`Crop year`, key = year, value = volume) %>% 
+    map(rename, country = `Crop year`) %>% 
+    map(mutate, year = lubridate::dmy(paste0("01-01", str_sub(year, 1, 4))))%>% 
+    map(filter, !grepl("(?:group|Total)", country)) %>% 
+    map(na.omit)
+allProd <- allProdCon[[1]]
+allCon <- allProdCon[[2]]
+
+ggColIndo <- bind_rows(
+    allProd %>% filter(country %in% c("Indonesia", "Colombia")) %>% mutate(series = "Production"),
+    allCon %>% filter(country %in% c("Indonesia", "Colombia")) %>% mutate(series = "Consumption")
+) %>% 
+    filter(year >= "2000-01-01")
+ggplot(ggColIndo, aes(x = year, y = volume/1000, group = rev(series), fill = country, alpha = series)) +
+    geom_area(position = "dodge") +
+    geom_label(data = filter(ggColIndo, year == "2016-01-01"), aes(label = series),
+               vjust = 0.5, hjust = 1) +
+    scale_fill_manual(values = c("#70c793", "#7882c0"), guide = FALSE) +
+    scale_alpha_manual(values = c(1, 0.5), guide = FALSE) +
+    facet_wrap(~country) +
+    theme_blog() +
+    scale_y_blog() +
+    labs(title = "Domestic consumption compared to production",
+         x = NULL, y = "Million 60kg bags")
+```
+
+### Conclusions
+
+Vietnam isn't going to start producing more coffee than Brazil any time soon. But these two countries are increasingly crucial for keeping us supplied with coffee. Worrying trend, etc. Smaller origins like El Salvador are disappearing because they simply can't compete. 
+
+*  Vietnam: Sustainable Coffee Program etc; starting to recognise the constraints, particularly environmental, that could limit future growth. 
+
+## Initial notes and ideas 
+
+*  In March 2017 Vietnam exported more coffee than Brazil. Was this a one-off or could Vietnam actually overtake Brazil as the world's largest supplier of coffee?
+*  Sections: 
+*  Has this ever happened before? monthly export data
+*  *Context*: March is coming towards the end of the Br coffee year, whereas in Vietnam it's the peak; look at **yearly flow**;
+*  *History*: Brazil is the largest producer in the world, and has been since records began (maybe go even further back); Vietnam is very much the new kid on the block (NKOTB), only really producing coffee in any significant quantities since 1990, WB programs etc; since then has become the 2nd largest producer in the world, and the single largest producer of Robusta coffee [yields etc]
+*  *Current trends*: Recent years, both countries affected by weasther; different trends. 
+*  Br importing Vietnamese coffee for the first time
+*  *Future potential*: Feels like both are approaching their limits, Br increasingly affected by weather, unable to fulfil potential; Vn trees are getting older, competition from other crops, water dependent etc. 
+
+*  Other notes:
+*  Battle for third? Colombia vs. Indonesia: Colombia very much on the increase after several years of decrease; Indo less consistent, increasing domestic consumption --> lower export availability/
+*  Other potential sources: could anyone do a Vietnam and become a major producers? Maybe China?
+
+## Data & Graphics etc 
+
+### Brazil: UN Comtrade + Ceca
+
+#### UN Comtade
+
+Data available up to Jan-17; needs to be converted to GBE; roughly similar to ICO numbers, but slightly different to Cecafe. Will probably do for the older stuff. Use Cecafe for last year. 
+
+```{r}
+getBrazil <- function(code) {
+    baseUrl <- 'http://comtrade.un.org/api/get?'
+    getUrl <- paste0(baseUrl,
+                     'max=500',
+                     '&freq=', 'M',
+                     '&r=76', 
+                     '&ps=', 'all',
+                     '&px=HS',
+                     '&p=0',
+                     '&rg=2',
+                     '&cc=', code, 
+                     '&fmt=json',
+                     '&type=C')
+    getData <- httr::GET(getUrl) %>% 
+        httr::content(., as = 'text') %>% 
+        jsonlite::fromJSON(., simplifyDataFrame = T, flatten = T) %>% 
+        `[[`('dataset') %>% 
+        select(date = period, country = rtTitle, code = cmdCode, volume = NetWeight) %>% 
+        na.omit()
+    
+    return(getData)
+}
+codes <- c('090111', '090112', '090121', '090122', '210111', '210112')
+
+brRaw <- purrr::map_df(codes, getBrazil)
+write_csv(brRaw, "output/brRaw.csv")
+br <- brRaw %>% 
+    mutate(volGBE = case_when(
+        .$code == '090111' ~ .$volume / 60,
+        .$code == '090112' ~ .$volume / 60 * 1.05,
+        .$code == '090121' ~ .$volume / 60 * 1.19,
+        .$code == '090122' ~ .$volume / 60 * 1.25,
+        .$code == '210111' ~ .$volume / 60 * 2.6,
+        .$code == '210112' ~ .$volume / 60 * 2.6 * 0.1
+    )) %>% 
+    group_by(date) %>% 
+    summarise(volume = sum(volGBE)) %>% 
+    mutate(date = lubridate::ymd(paste0(period, "01")),
+           country = "Brazil")
+```
+
+#### Cecafe
+
+April export report gives last twelve months. Going to manually enter the data and use instead of UN Comtrade for the last 12 months. 
+
+```{r}
+cecafe <- data_frame(
+    period = seq.Date(from = lubridate::ymd("2016-05-01"), to = lubridate::ymd("2017-04-01"), by = "month"),
+    volume = c(2529042, 2450947, 1967328, 3043610, 3067495, 3363064, 3277106, 3260311, 2644861, 2579707, 2799574, 2126054),
+    country = "Brazil"
+)
+br <- br %>% 
+    filter(period < "2016-05-01") %>% 
+    bind_rows(cecafe)
+```
+
+Preliminary look at Brazilian data results
+
+```{r, echo = F}
+brCY <- br %>% 
+    filter(period >= "2010-04-01") %>% 
+    mutate(year = ifelse(lubridate::month(period) == 4, lubridate::year(period), NA)) %>% 
+    fill(year)
+ggplot(brCY, aes(x = ordered(month(period), levels = unique(month(period))), y = volume, 
+                 group = year, color = factor(year))) + 
+    geom_line()
+ggplot(brCY %>% 
+           mutate(month = ordered(month(period), 
+                                  levels = unique(month(period)),
+                                  labels = month.abb[unique(month(period))])) %>% 
+           group_by(month) %>% 
+           summarise(min = min(volume), max = max(volume), mean = mean(volume)) %>% 
+           ungroup(),
+       aes(x = month)) +
+    geom_line(aes(group = 1, y = mean), color = "#ef8066", size = 2) +
+    geom_ribbon(aes(group = 1, ymin = min, ymax = max, x = month), fill = "#619fb5", alpha = 0.5)
+```
+
+### Vietnam
+
+*  Monthly data for Vietnam isn't available from UN Comtrade
+*  Instead: try downloading from the vietnamese customs website pdfs, then check yearly totals against UN Comtrade?
+*  https://www.customs.gov.vn/Lists/EnglishStatistics/ScheduledData.aspx?Group=Trade+analysis&language=en-US
+*  NB Brazil data - need to check if it's GBE or not, might need to be treated individually, like Eurostat etc. 
+
+#### Vietnam data from customs website. NB Some missing months. 
+
+```{r}
+# Vietnam customs data: pdf from website
+vnDocs <- list.files(file.path(coffeestats, "input/vietnam"), pattern = ".pdf")
+
+getVn <- function(fileName) {
+    fullPath = file.path(coffeestats, "input/vietnam", fileName)
+    
+    coffee <- tabulizer::extract_tables(fullPath, pages = 1,
+                                        method = "data.frame") %>% 
+        magrittr::extract2(1) %>% 
+        select(coffee = X.1, volume = Reporting.month) %>% 
+        filter(grepl("Coffee", coffee)) %>% 
+        mutate(volume = stringr::str_extract(
+            volume, "^(.*?)\\s"
+        ))
+    date <- pdftools::pdf_text(pdf = fullPath) %>% 
+        stringr::str_extract(., paste0(
+            paste(month.name, collapse = ".{0,3}\\d{4}|"),
+            ".{0,3}\\d{4}"
+        )) %>% 
+        magrittr::extract2(1)
+    result <- cbind(coffee, date)
+    return(result)
+}
+
+vnRaw <- map_df(vnDocs, getVn)
+
+vnFinal <- vnRaw %>% 
+    select(-coffee) %>% 
+    mutate(date = lubridate::dmy(paste("01", date)),
+           volume = as.numeric(gsub(",", "", volume))/0.06,
+           country = "Vietnam") %>% 
+    arrange(date) %>% 
+    as_data_frame()
+
+# Get seasonal flow
+vn <- vnFinal %>% 
+    filter(date >= "2010-10-01") %>%
+    arrange(date) %>% 
+    mutate(year = ifelse(lubridate::month(date) == 10, lubridate::year(date), NA),
+           year = zoo::na.locf(year, na.rm = FALSE),
+           month = ordered(month(date), 
+                           levels = c(10:12, 1:9), 
+                           labels = month.abb[c(10:12, 1:9)]))
+
+ggplot(vn, aes(x = month, y = volume, group = year, color = year)) +
+    geom_line()
+ggplot(vn %>% 
+           group_by(month) %>% 
+           summarise(min = min(volume), max = max(volume), mean = mean(volume)) %>% 
+           ungroup(),
+       aes(x = month)) +
+    geom_line(aes(group = 1, y = mean), color = "#ef8066", size = 1.5) +
+    geom_ribbon(aes(group = 1, ymin = min, ymax = max), fill = "#619fb5", alpha = 0.5)
+```
+
+### Compare exports
+
+*  Try overlaying the two?
+
+```{r}
+theTwo <- bind_rows(
+    brCY %>% rename(date = period),
+    vnFinal %>% select(date, volume) %>% mutate(country = "Vietnam")
+)
+```
+
+Starting in October:
+
+```{r, echo = FALSE}
+# Try a couple of different crop years
+theTwoOct <- theTwo %>%
+    filter(date >= "2010-10-01") %>% 
+    mutate(year = ifelse(month(date) == 10, year(date), NA),
+           year = zoo::na.locf(year),
+           month = ordered(month(date), levels = c(10:12, 1:9), labels = month.abb[c(10:12, 1:9)])) %>% 
+    group_by(country, month) %>% 
+    summarise(min = min(volume), max = max(volume), mean = mean(volume)) %>% 
+    ungroup()
+ggplot(theTwoOct, aes(x = month, group = country)) +
+    geom_line(aes(y = mean, color = country)) +
+    geom_ribbon(aes(ymin = min, ymax = max, fill = country), alpha = 0.3)
+```
+
+And starting in April: 
+
+```{r, echo = FALSE}
+theTwoApr <- theTwo %>%
+    filter(date >= "2010-04-01") %>% 
+    mutate(month = ordered(month(date), levels = c(4:12, 1:3), labels = month.abb[c(4:12, 1:3)])) %>% 
+    na.omit() %>% 
+    group_by(country, month) %>% 
+    summarise(min = min(volume), max = max(volume), mean = mean(volume)) %>% 
+    ungroup()
+ggplot(theTwoApr, aes(x = month, group = country)) +
+    geom_line(aes(y = mean, color = country)) +
+    geom_ribbon(aes(ymin = min, ymax = max, fill = country), alpha = 0.3)
+```
+
+Can you get a dropdown menu to change between the two? Not really, probably not worth spending time on this. 
+
+```{r, echo = FALSE}
+plotlyOct <- cbind(theTwoOct %>% filter(country == "Brazil") %>% rename(Brazil = country, brMonth = month, brMin = min, brMax = max, brMean = mean), theTwoOct %>% filter(country == "Vietnam") %>% rename(Vietnam = country, vnMonth = month, vnMin = min, vnMax = max, vnMean = mean)) %>% select(-Brazil, -Vietnam, -vnMonth) %>% rename(month = brMonth)
+plotlyApr <- cbind(theTwoApr %>% filter(country == "Brazil") %>% rename(Brazil = country, brMonth = month, brMin = min, brMax = max, brMean = mean), theTwoOct %>% filter(country == "Vietnam") %>% rename(Vietnam = country, vnMonth = month, vnMin = min, vnMax = max, vnMean = mean)) %>% select(-Brazil, -Vietnam, -vnMonth) %>% rename(month = brMonth)
+
+plotlyTwo <- theTwo %>% 
+    spread(key = country, value = volume) %>% 
+    group_by(month(date)) %>% 
+    mutate(brMax = max(Brazil, na.rm=T), brMin = min(Brazil, na.rm=T), brMean = mean(Brazil, na.rm=T),
+           vnMax = max(Vietnam, na.rm=T), vnMin = min(Vietnam, na.rm=T), vnMean = mean(Vietnam, na.rm=T)) %>% 
+    select(-date, -Brazil, -Vietnam) %>% 
+    rename(month = `month(date)`) %>%
+    ungroup() %>% 
+    mutate(month = factor(month.abb[month])) %>% 
+    head(12)
+
+cropYear <- data.frame(
+    oct = ordered(month.abb[c(10:12, 1:9)], levels = month.abb[c(10:12, 1:9)]),
+    apr = ordered(month.abb[c(4:12, 1:3)], levels = month.abb[c(4:12, 1:3)])
+)
+xOct <- list(
+    type = "category",
+    categoryorder = "array",
+    categoryarray = cropYear$oct
+    # range = list(c(10:12, 1:9))
+)
+xApr <- list(
+    type = "category",
+    categoryorder = "array",
+    categoryarray = cropYear$apr
+)
+
+plot_ly(data = plotlyTwoTwo) %>% 
+    add_lines(y = ~brMeanOct, x = ~octMonth) %>% 
+    add_lines(y = ~brMeanApr, x = ~aprMonth) %>% 
+    add_lines(y = ~vnMeanOct, x = ~octMonth) %>% 
+    add_lines(y = ~vnMeanApr, x = ~aprMonth) %>% 
+    add_ribbons(ymax = ~brMaxOct, ymin = ~brMinOct, x = ~octMonth) %>%
+    add_ribbons(ymax = ~brMaxApr, ymin = ~brMinApr, x = ~aprMonth) %>% 
+    add_ribbons(ymax = ~vnMaxOct, ymin = ~vnMinOct, x = ~octMonth) %>% 
+    add_ribbons(ymax = ~vnMaxApr, ymin = ~vnMinApr, x = ~aprMonth) %>% 
+    layout(
+        # xaxis = xOct,
+        updatemenus = list(
+            list(
+                visible = TRUE,
+                type = "buttons",
+                direction = "right",
+                active = 0,
+                showActive = TRUE,
+                buttons = list(
+                    list(
+                        method = "restyle",
+                        args = list("visible", list(TRUE, FALSE, TRUE, FALSE,
+                                                    TRUE, FALSE, TRUE, FALSE)),
+                        label = "October"
+                    ),
+                    list(
+                        method = "restyle",
+                        args = list("visible", list(FALSE, TRUE, FALSE, TRUE,
+                                                    FALSE, TRUE, FALSE, TRUE)),
+                        label = "April"
+                    )
+                )
+            )
+        )
+    )
+
+
+```
+
+#### Difference
+
+```{r}
+theTwoDiff <- theTwo %>% 
+    select(-year) %>% 
+    spread(key = country, value = volume) %>% 
+    na.omit() %>% 
+    mutate(diff = Vietnam - Brazil, fill = ifelse(diff > 0, 2, 1))
+
+ggplot(theTwoDiff, aes(x = date, y = diff, fill = factor(fill))) +
+    geom_smooth(method = "lm") +
+    geom_col()
+```
+
+Alternatively, 
+
+```{r}
+ggplot(theTwo, aes(x = date, y = volume, group = country, fill = country, color = country)) +
+    geom_col(position = "dodge") +
+    geom_smooth(method = "lm", se = FALSE)
+```
+
+
+### Rise of Vietnam
+
+Use info from Mauricio's presentation?
+
+Get historical production from the ICO website
+
+```{r}
+source(file.path(coffeestats, "scripts/getProduction.R"))
+getProduction()
+
+plotRiseOfVietnam <- prodAll %>% mutate(countryFac = forcats::fct_other(Country, keep = c("Brazil", "Vietnam"), 
+                                                                        other_level = "Others"))
+# plot_ly(plotRiseOfVietnam, x = ~year, y = ~value, group = ~Country, type = "scatter", mode = "lines")
+p <- plot_ly()
+for(i in unique(plotRiseOfVietnam$Country)) {
+    p <- p %>% 
+        add_trace(data = filter(plotRiseOfVietnam, Country == i), x = ~year, y = ~value, 
+                  name = ~countryFac, 
+                  line = list(color = ~ifelse(countryFac == "Brazil", "#619fb5",
+                                              ifelse(countryFac == "Vietnam", "#ef8066", "#ffcb90"))),
+                  text = ~Country, hoverinfo = "text",
+                  showlegend = ~ifelse(unique(Country) %in% c("Brazil", "Vietnam", "Colombia"), TRUE, FALSE),
+                  legendgroup = ~countryFac,
+                  type = "scatter", mode = "lines")
+}
+p %>% layout(title = "Rise of coffee production in Vietnam",
+             xaxis = list(title = "", showline = FALSE, tickangle = 325),
+             yaxis = list(title = "Million 60kg bags", zeroline = FALSE, separatethousands = TRUE),
+             margin = list(l = 60),
+             font = list(family = "sans-serif", color = "#515151"))
+```
+
+### FAOSTAT yield data
+
+```{r, echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, out.height = "300px", out.width = "100%"}
+# NB Download faostat.csv to input folder
+yieldData <- read_csv(file.path(coffeestats, "input/faostat.csv")) %>% 
+    select(country = Area, year = Year, value = Value) %>% 
+    mutate(country = ifelse(grepl("Viet Nam", country), "Vietnam", country))
+top10 <- prodAll %>% group_by(Country) %>% top_n(n = 1, wt = year) %>% ungroup() %>% top_n(n = 10, wt = value) %>% magrittr::extract2('Country')
+plotYields <- yieldData %>% 
+    group_by(country) %>% 
+    top_n(n = 1, wt = year) %>% 
+    ungroup() %>% 
+    filter(country %in% top10) %>% 
+    mutate(country = forcats::fct_reorder(country, value),
+           value = value/10)
+plot_ly(plotYields, x = ~value, y = ~country, type = "bar", orientation = "h", color = ~country,
+        marker = list(color = c(rep("#619fb5", 9), "#ef8066")), text = ~paste0(country, ": ", format(value, digits = 1, big.mark = ","), "kg/ha"), hoverinfo = "text") %>% 
+    layout(title = "Coffee yields by country",
+           xaxis = list(title = "(kg/ha)", zeroline = FALSE, separatethousands = TRUE),
+           yaxis = list(title = "", showline = FALSE),
+           font  = list(family = "sans-serif", color = "#515151"),
+           showlegend = FALSE)
+```
+
+## Plotly
+
+### Brazil/Vietnam cycles
+
+```{r}
+# Need to put data together again; use vnFinal and br for now.
+pVnBrCycleData <- bind_rows(vnFinal, br) %>% 
+    filter(date >= "01-10-2010") %>% 
+    mutate(monthFac = ordered(lubridate::month(date),
+                              levels = c(10:12, 1:9),
+                              labels = month.abb[c(10:12, 1:9)]))
+
+# Produce the loess curve first, then use broom package to get confidence intervals
+getLoess <- function(x) {
+    broom::augment(loess(volume~monthNum, data = x)) %>% 
+        select(monthNum, .fitted, .se.fit)
+}
+
+splitLoess <- pVnBrCycleData %>% 
+    filter(date >= "2012-10-01") %>% 
+    group_by(country) %>% 
+    mutate(monthNum = as.numeric(monthFac)) %>% 
+    nest() %>% 
+    mutate(fit = purrr::map(data, getLoess),
+           fit = purrr::map(fit, select, -monthNum)) %>% 
+    unnest() %>% 
+    select(country, monthFac, volume, .fitted, .se.fit) %>% 
+    group_by(country, monthFac) %>% 
+    mutate(mean = mean(volume)) %>% 
+    ungroup() %>% 
+    distinct(country, monthFac, mean, .fitted, .se.fit)
+
+plot_ly() %>% 
+    ## Brazil average points
+    add_trace(name = "Brazil", legendgroup = "Brazil", showlegend = FALSE,
+              data = filter(splitLoess, country == "Brazil"),
+              marker = list(color = blogColours[1]),
+              x = ~monthFac, y = ~mean, type = "scatter", mode = "markers") %>% 
+    ## Brazil loess curve
+    add_lines(name = "Brazil", legendgroup = "Brazil",
+              data = filter(splitLoess, country == "Brazil"),
+              line = list(shape = "spline", smoothing = 1.3, simplify = FALSE, color = blogColours[1]),
+              x = ~monthFac, y = ~.fitted) %>% 
+    ## Brazil confidence interval
+    add_ribbons(data = filter(splitLoess, country == "Brazil"),
+                name = "Brazil", legendgroup = "Brazil", showlegend = FALSE,
+                x = ~monthFac,
+                line = list(shape = "spline", smoothing = 1.3, simplify = FALSE, color = paste0(blogColours[1], "80")),
+                fillcolor = paste0(blogColours[1], "80"),
+                ymin = ~.fitted - 1.96*.se.fit,
+                ymax = ~.fitted + 1.96*.se.fit) %>% 
+    ## Vietnam average points
+    add_trace(legendgroup = "Vietnam", showlegend = FALSE,
+              data = filter(splitLoess, country == "Vietnam"),
+              marker = list(color = blogColours[2]),
+              x = ~monthFac, y = ~mean, type = "scatter", mode = "markers") %>% 
+    ## Vietnam loess curve
+    add_lines(name = "Vietnam", legendgroup = "Vietnam",
+              data = filter(splitLoess, country == "Vietnam"),
+              line = list(shape = "spline", smoothing = 1.3, simplify = FALSE, color = blogColours[2]),
+              x = ~monthFac, y = ~.fitted) %>% 
+    ## Vietnam confidence interval
+    add_ribbons(data = filter(splitLoess, country == "Vietnam"),
+                name = "Vietnam", legendgroup = "Vietnam", showlegend = FALSE,
+                x = ~monthFac, 
+                line = list(shape = "spline", smoothing = 1.3, simplify = FALSE, color = paste0(blogColours[2], "80")),
+                 fillcolor = paste0(blogColours[2], "80"),
+               ymin = ~.fitted - 1.96*.se.fit,
+                ymax = ~.fitted + 1.96*.se.fit) %>% 
+    layout(title = "Average exports by Brazil and Vietnam",
+           xaxis = list(title = "", showgrid = FALSE),
+           yaxis = list(title = "Million 60kg bags"),
+           font = list(color = "#515151"))
+
+```
+
+
+### Colombia/Indonesia
+
+```{r}
+allProdCon <- c(file.path(project, "input", "prod.xlsx"), file.path(project, "input", "cons.xlsx")) %>% 
+    map(read_excel, sheet = 1, col_names = TRUE, skip = 3) %>% 
+    map(select, -2) %>% 
+    map(gather, -`Crop year`, key = year, value = volume) %>% 
+    map(rename, country = `Crop year`) %>% 
+    map(mutate, year = lubridate::dmy(paste0("01-01", str_sub(year, 1, 4))))%>% 
+    map(filter, !grepl("(?:group|Total)", country)) %>% 
+    map(na.omit)
+allProd <- allProdCon[[1]]
+allCon <- allProdCon[[2]]
+
+pColIndoData <- bind_rows(
+    allProd %>% filter(country %in% c("Indonesia", "Colombia")) %>% mutate(series = "Production"),
+    allCon %>% filter(country %in% c("Indonesia", "Colombia")) %>% mutate(series = "Consumption")
+) %>% 
+    filter(year >= "2000-01-01")
+
+pColIndo1 <- plot_ly() %>% 
+    add_trace(data = pColIndoData %>% filter(country == "Colombia", series == "Production"),
+              name = "Production", 
+              text = ~paste0("(", lubridate::year(year), ") Production: ", round(volume/1000, 1), "m"),
+              hoverinfo = "text",
+              x = ~year, y = ~volume/1000, type = "scatter", mode = "lines", fill = "tozeroy",
+              line = list(color = "#70c793"), fillcolor = "#70c79380") %>% 
+    add_trace(data = pColIndoData %>% filter(country == "Colombia", series == "Consumption"),
+              name = "Consumption",
+              text = ~paste0("(", lubridate::year(year), ") Consumption: ", round(volume/1000, 1), "m"),
+              hoverinfo = "text",
+              x = ~year, y = ~volume/1000, type = "scatter", mode = "lines", fill = "tozeroy",
+              line = list(color = "#70c793"), fillcolor = "#70c793FF") %>% 
+    add_annotations(text = "Colombia", font = list(family = "sans-serif", color = "#515151"),
+                    bgcolor = "#D9D9D9", borderpad = 4, showarrow = FALSE, width = 120,
+                    xref = "paper", x = 0.5, xanchor = "center",
+                    yref = "y", y = 15.5, yanchor = "top") %>% 
+    add_annotations(x = lubridate::dmy("31-12-2015"), xref = "x", xanchor = "right",
+                    y = c(1, 14), yref = "y",
+                    bgcolor = c("#70c793FF", "#70c79380"), bordercolor = "#70c793FF",
+                    borderpad = 4, 
+                    text = c("Consumption", "Production"), showarrow = FALSE,
+                    font = list(family = "sans-serif", size = 12, color = "#515151"))
+pColIndo2 <- plot_ly() %>% 
+    add_trace(data = pColIndoData %>% filter(country == "Indonesia", series == "Production"),
+              name = "Production",
+              text = ~paste0("(", lubridate::year(year), ") Production: ", round(volume/1000, 1), "m"),
+              hoverinfo = "text",
+              x = ~year, y = ~volume/1000, type = "scatter", mode = "lines", fill = "tozeroy",
+              line = list(color = "#7882c0"), fillcolor = "#7882c080") %>% 
+    add_trace(data = pColIndoData %>% filter(country == "Indonesia", series == "Consumption"),
+              name = "Consumption",
+              text = ~paste0("(", lubridate::year(year), ") Consumption: ", round(volume/1000, 1), "m"),
+              hoverinfo = "text",
+              x = ~year, y = ~volume/1000, type = "scatter", mode = "lines", fill = "tozeroy",
+              line = list(color = "#7882c0"), fillcolor = "#7882c0FF") %>% 
+    add_annotations(text = "Indonesia", font = list(family = "sans-serif", color = "#515151"),
+                    bgcolor = "#D9D9D9", borderpad = 4, showarrow = FALSE,
+                    xref = "paper", x = 0.5, xanchor = "center",
+                    yref = "y", y = 15.5, yanchor = "top") %>% 
+    add_annotations(x = lubridate::dmy("31-12-2015"), xref = "x2", xanchor = "right",
+                    y = c(4, 10), yref = "y",
+                    bgcolor = c("#7882c0FF", "#7882c080"), 
+                    bordercolor = c("#7882c080", "#7882c0FF"),
+                    borderpad = 4, 
+                    text = c("Consumption", "Production"), showarrow = FALSE,
+                    font = list(family = "sans-serif", size = 12, color = "#515151")) %>% 
+    layout(xaxis = list(showgrid = FALSE))
+subplot(pColIndo1, pColIndo2, nrows = 1, shareY = TRUE, shareX = TRUE, titleX = FALSE,
+        which_layout = 2) %>% 
+    layout(title = "Consumption and Production in Colombia and Indonesia",
+           xaxis = list(title = "", showline = FALSE, showgrid = FALSE),
+           yaxis = list(title = "Million 60kg bags", zeroline = FALSE),
+           font = list(family = "sans-serif", color = "#515151"),
+           margin = list(b = 20),
+           showlegend = FALSE)
+```
+

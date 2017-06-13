@@ -1,0 +1,246 @@
+/* New CSS file, rewritten (mostly) from scratch */
+
+html, body {
+  font-family: "Noto Sans", Helvetica, Arial, sans-serif;
+  color: #515151;
+  font-weight: 400;
+}
+
+strong {
+  font-weight: 700;
+  color: #000000;
+}
+
+/*
+ * Sidebar: Starts fixed on the left, then moves up for phones/tablets (<992px)
+*/
+
+.sidebar {
+  /*text-align: center;*/
+  position: fixed;
+  height: 100%;
+  /*min-width: 275px;*/
+  padding: 4rem 2rem;
+  color: white;
+  background-color: #6a9fb5;
+  justify-content: flex-start;
+}
+
+.sidebar-nav {
+  position: absolute;
+  padding: 2rem 0.5rem;
+  max-width: 295px;
+  /*height: 100%;*/
+  /*vertical-align: bottom;*/
+  bottom: 0px;
+  list-style: none;
+}
+
+/* Side bar description*/
+.sidebar-nav p {
+  color: white;
+  font-size: 1.2rem;
+  /*margin: 0.4rem;*/
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+.sidebar-nav li {
+  list-style: none;
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color:white;
+}
+.sidebar-nav ul {
+  padding-left: 0px;
+}
+
+.sidebar-nav a {
+  color:white;
+}
+
+/* Remove underline from fontawesome icon links on hover */
+.iconLink {
+  margin-top: 2rem;
+}
+.iconLink a {
+  color: white;
+}
+.iconLink a:hover {
+  text-decoration: none;
+}
+
+/* Want to space out icons in sidebar a bit */
+.iconLink .fa {
+  margin-right: 0.5rem;
+}
+
+/* Sidebar title */
+.sidebar h1 {
+  font-size: 3rem;
+  color: white;
+  font-style: italic;
+}
+
+/* Add margin to each post on homepage
+   NB Also use this class for most content
+   */
+.post {
+  padding: 2rem;
+  margin-bottom: 4rem;
+}
+
+/* Links */
+a {
+  color: #6a9fb5;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Noto Serif", serif;
+  margin-bottom: .5rem;
+  font-weight: bold;
+  line-height: 1.25;
+  color: #313131;
+}
+
+/* Date styling */
+.post-date {
+  margin-top: -.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #9a9a9a;
+}
+
+/* Tables: using bootstrap, but row height is a little too high */
+/* NB This needs some jQuery to add table class to tables... */
+.table td, .table th {
+  padding: 0.25rem 0.75rem;
+}
+
+/* Tags */
+a#tags {
+  /*background-color: white;*/
+  border: 2px solid #6a9fb5;
+  color: #6a9fb5;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.82rem;
+  border-radius: 0.625rem;
+}
+
+a:hover#tags {
+  text-decoration: underline;
+  background-color: #6a9fb5;
+  color: white;
+}
+
+/* Testing styling for the summary list of tags */
+/* Come back to this! */
+.tagRow {
+  padding: 0.5rem;
+  min-height: 9rem;
+}
+.tagRow:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+.tagRow img {
+  /*border: 1px solid black;*/
+  max-height: 12rem;
+  float: right;
+}
+
+/* Message class */
+.message {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  color: #717171;
+  background-color: #f9f9f9;
+}
+
+/* Just need to add a margin to bottom of leaflet maps.
+   Might need to do this for other htmlwidgets as well.
+   Yep, also adding for plotly.
+   */
+
+.html-widget {
+  margin-bottom: 1rem;
+}
+
+/* Profile picture thumbnail */
+.img-thumbnail {
+  margin: 0.5rem;
+  margin-top: 0;
+  border-radius: 50%;
+}
+
+/* Want to keep table captions at the top */
+caption {
+  caption-side:top;
+}
+
+/* But don't want captions for images */
+.figure .caption {
+  display:none;
+}
+
+.figure {
+  margin-bottom: 1rem;
+  max-width: 100%;
+}
+
+/* Manually fix sidebar to top for phone/tablet */
+@media (max-width: 991px) {
+  .sidebar {
+    justify-content: center;
+    position: relative;
+    height: auto;
+    min-height: 330px;
+    text-align: center;
+    padding: 0;
+  }
+
+  .sidebar-nav {
+    text-align: center;
+    padding: 1rem;
+    max-width: 100%;
+    bottom: auto;
+    position: absolute;
+  }
+
+  .iconLink {
+    margin-top: 1rem;
+  }
+
+  .sidebar-nav p {
+    margin-bottom: 1rem;
+  }
+
+  .post {
+    padding: 1rem;
+  }
+}
+
+/* Also just want to reduce padding around posts for phone view */
+@media (max-width: 767px) {
+  .post {
+    padding: 1rem 0.5rem;
+  }
+
+/* Reduce thumbnail size for phones */
+  .img-thumbnail {
+    margin: 0.5rem;
+    margin-top: 0;
+    border-radius: 50%;
+    max-width: 170px;
+    max-height: 170px;
+  }
+
+}

@@ -1,0 +1,12 @@
+"0","allCommodities <- read_csv(""~/Dropbox/Work/coffeestats/output/allCommodities.csv"")
+"
+"2","Parsed with column specification:
+cols(
+  year = col_integer(),
+  country = col_character(),
+  countryCode = col_character(),
+  value = col_double(),
+  hsCode = col_character(),
+  commodity = col_character()
+)
+"

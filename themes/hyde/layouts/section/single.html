@@ -1,0 +1,20 @@
+	{{ partial "head.html" . }}
+	<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+		{{ partial "sidebar.html" . }}
+
+		<div class="content container-fluid">
+			<div class="post">
+			 	<h1>{{ .Title }}</h1>
+			  <!-- <span class="post-date">{{ .Date.Format "Mon, Jan 2, 2006" }}</span> -->
+			      {{ .Content }}
+Testin testing testing
+			<div>
+				{{ range .Params.tags }}
+					<a id="tags" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
+				{{ end }}
+			</div>
+			</div>
+		</div>
+
+  </body>
+</html>

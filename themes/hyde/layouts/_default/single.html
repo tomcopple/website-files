@@ -1,0 +1,31 @@
+{{ partial "head.html" . }}
+<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+	<div class = "container-fluid">
+		<div class = "row">
+			{{ partial "sidebar.html" . }}
+
+			<div class="col-lg-8 offset-lg-3">
+				<div class="post">
+			 		<h1>{{ .Title }}</h1>
+			  	<div class="post-date">
+						<span>{{ .Date.Format "Mon, Jan 2, 2006" }}</span>
+					</div>
+					{{ .Content }}
+
+					<div>
+						{{ range .Params.tags }}
+							<a id="tags" href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
+						{{ end }}
+					</div>
+				</div>
+
+				{{ if and (isset .Site.Params "disqusShortname") (ne .Site.Params.disqusShortname "") }}
+					<h2>Comments</h2>
+					{{ partial "disqus" . }}
+				{{ end }}
+
+			</div>
+		</div>
+	</div>
+</body>
+</html>

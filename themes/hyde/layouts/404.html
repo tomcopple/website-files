@@ -1,0 +1,19 @@
+{{ partial "head.html" . }}
+<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+	<div class = "container-fluid">
+		<div class = "row">
+			{{ partial "sidebar.html" . }}
+
+			<div class="col-lg-8 offset-lg-3 post">
+
+        <h1>404: Page not found</h1>
+        <p class="lead">Sorry, that URL doesn't seem to exist. Try
+          <a href="{{ .Site.BaseURL }}">heading back to the homepage</a>.
+        </p>
+
+        <img src = "{{ .Site.BaseURL }}img/nothing-to-see.gif" alt = "Nothing-to-see-here">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
