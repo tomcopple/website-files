@@ -9,8 +9,8 @@ export LC_TIME=en_US.UTF-8
 MESSAGE="Site rebuild $(date)"
 
 # Build the project.
-
-RScript -e 'blogdown::build_site()'
+# Removing this for now - think I want to build manually to check before deploying. 
+# RScript -e 'blogdown::build_site()'
 
 
 # Go To Public folder

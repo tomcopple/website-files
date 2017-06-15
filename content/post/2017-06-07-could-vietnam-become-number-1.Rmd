@@ -4,7 +4,7 @@ Categories:
 Description: "It's not far off, which could be a problem for the coffee industry."
 Tags:
     - Coffee
-date: 2017-06-07
+date: 2017-06-16
 thumbnail: "couldVietnam.png"
 title: "Could Vietnam become the world's main source of coffee?"
 slug: "could-vietnam-become-number-1"
@@ -203,7 +203,7 @@ plot_ly(pYieldData,
                     showarrow = F,
                     xanchor = "right",
                     text = "<i>Source: FAO</i>") %>%
-    layout(title = "Coffee yields by country",
+    layout(title = "Coffee yields in major producing countries",
            xaxis = list(title = "(kg/ha)", separatethousands = TRUE, zeroline = FALSE),
            yaxis = list(title = ""),
            font  = list(family = "sans-serif", color = "#515151"),
@@ -211,9 +211,9 @@ plot_ly(pYieldData,
            showlegend = FALSE)
 ```
 
-In Brazil, these high yields are achieved because much of the farming is centred on larger estate farms, with relatively high levels of mechanisation. Coffee farms in Brazil are generally less mountainous, which means that the coffee can be picked by machines rather than by hand, which is more efficient. In Vietnam, on other hand, the strong productivity is a result of heavy use of irrigation and fertilisers, along with relatively low input costs. 
+In Brazil, these high yields are achieved because much of the farming is centred on larger estate farms, with relatively high levels of mechanisation. Coffee farms in Brazil are generally less mountainous, which means that the coffee can be picked by machines rather than by hand, which is more efficient. In Vietnam, on the other hand, the strong productivity is a result of a heavy use of irrigation and fertilisers, along with relatively low input costs. 
 
-As a result of this consolidation, the world is becoming more dependent on just two countries to meet its demand for coffee. This has serious implications for the future sustainability of the sector. As other origins struggle to compete, the supply of coffee becomes less diversified and market risk and volatility are likely to increase. 
+As a result of this disparity, the world is becoming more dependent on just two countries to meet its demand for coffee. This has serious implications for the future sustainability of the sector. As other origins struggle to compete, the supply of coffee becomes less diversified and market risk and volatility are likely to increase. 
 
 ### Recent trends
 
@@ -228,7 +228,7 @@ pBr <- plot_ly(prodAll %>%
               text = ~paste0("(", lubridate::year(year), ") ", round(value/1000, 1), "m bags"),
               hoverinfo = "text") %>%
     add_trace(type = "scatter", mode = "lines", line = list(color = blogColours[1]), 
-              hoverinfo = "none",
+              text = ~paste(Country, "Trend"), hoverinfo = "text",
               y = ~(fitted(loess(value~year, data = prodAll %>% 
                                      filter(Country == "Brazil", year >= "2000")))/1000)) %>%
     add_annotations(text = "Brazil", font = list(family = "sans-serif", color = "#515151"),
@@ -244,7 +244,7 @@ pVn <- plot_ly(prodAll %>%
               text = ~paste0("(", lubridate::year(year), ") ", round(value/1000, 1), "m bags"),
               hoverinfo = "text") %>%
     add_trace(type = "scatter", mode = "lines", line = list(color = blogColours[2]), 
-              hoverinfo = "none",
+              text = ~paste(Country, "Trend"), hoverinfo = "text",
               y = ~(fitted(loess(value~year, data = prodAll %>%
                                      filter(Country == "Vietnam", year >= "2000")))/1000)) %>%
     add_annotations(text = "Vietnam", font = list(family = "sans-serif", color = "#515151"),
@@ -268,17 +268,15 @@ subplot(pBr, pVn, shareY = FALSE, shareX = FALSE, titleY = FALSE) %>%
            margin = list(b = 50))
 ```
 
-In Vietnam, the industry is further squeezed by the fact that coffee trees generally have an optimal lifespan of around 25 years. Much of Vietnam's current coffee area was planted in the early 1990s, which means that many of the trees are reaching the end of their peak productive capacity. Simply maintaining current output volumes will require significant investment in replanting and regeneration.
+In Vietnam, the industry is further squeezed by the fact that coffee trees generally reach their productive peak after around 25 years. Much of Vietnam's current coffee area was planted in the early 1990s, which means that many of the trees are now starting to decline in capacity. Simply maintaining current output levels will require significant investment in replanting and regeneration.
 
-These recent developments show the implicit dangers of consolidation. The more the market depends on output from a small number of countries, the riskier the supply situation is, as a poor harvest from Brazil or Vietnam can have major consequences for the international market, much more than any other individual country.
-
-Given this concern, are there any other countries that could step in to help quench the world's growing thirst for coffee?
+Given these recent developments, it's not clear if either country will be able to continue expanding at such rapid rates. Are there any other countries that could step in to help quench the world's growing thirst for coffee?
 
 ### The battle for third place
 
-While Brazil and Vietnam are in a league of their own when it comes to coffee exports, there is another interesting tussle between the third and fourth placed producers - Colombia and Indonesia. Like Brazil, both have a strong historical association with coffee, see for example the ubiquity of `r htmltools::HTML("<a href='https://twitter.com/juanvaldez' target='_blank'>Juan Valdez</a>")` or the connotations of the island of `r htmltools::HTML("<a href='https://www.google.co.uk/maps/place/Java/@-8.4387204,108.6095259,6.45z/' target-'_blank'>Java</a>")`. Between them, Colombia and Indonesia produce around 25 million bags of coffee a year, or a sixth of the world total.
+While Brazil and Vietnam are in a league of their own when it comes to coffee exports, there is another interesting tussle between the third and fourth placed producers - Colombia and Indonesia. Like Brazil, both have a strong historical association with coffee, see for example the ubiquity of `r htmltools::HTML("<a href='https://twitter.com/juanvaldez' target='_blank'>Juan Valdez</a>")` or the connotations of the island of `r htmltools::HTML('<a href="https://www.google.co.uk/maps/place/Java/@-8.4387204,108.6095259,6.45z/" target="_blank">Java</a>')`. Between them, Colombia and Indonesia produce around 25 million bags of coffee a year, or a sixth of the world total.
 
-Both countries have had ups and downs recently. In Colombia, an outbreak of coffee leaf rust and abnormally heavy rains devastated production between 2008 and 2012 (see below). Only a huge financial investment from the national coffee authority, the *Federación Nacional de Cafeteros*, enabled Colombia to recover and even exceed its previous output levels. Production has now increased for the last 4 consecutive years, and could hit a 24-year high in 2017. If this resurgence continues, Colombia could potentially produce 20 million bags by 2020, though this would still be well short of Vietnam's current level.
+Both countries have had their ups and downs recently. In Colombia, an outbreak of coffee leaf rust and abnormally heavy rains devastated production between 2008 and 2012 (see below). Only a huge financial investment from the national coffee authority, the *Federación Nacional de Cafeteros*, enabled Colombia to recover and even exceed its previous output levels. Production has now increased for the last 5 consecutive years, and could hit a 24-year high in 2017. If this resurgence continues, Colombia could potentially produce 20 million bags by 2020, though this would still be well short of Vietnam's current level.
 
 ```{r, include = FALSE}
 library(readxl)
@@ -367,4 +365,4 @@ In Indonesia, on the other hand, while output has generally been increasing, the
 
 ### Conclusions
 
-Vietnam isn't going to start producing more coffee than Brazil any time soon, but the fact that these two countries are increasingly crucial for keeping us supplied with coffee is a worrying trend. The high yields in both countries suggest that there is little opportunity to continue increasing output without expanding the growing area, particularly as the existing coffee trees reach their productive peak. Indeed, production growth in both countries has slowed over the last few years. As global demand for coffee keeps expanding, competition for beans is likely to become more intense, but it's not clear who's going to supply the market. 
+Vietnam isn't going to start producing more coffee than Brazil any time soon, but the fact that these two origins are increasingly crucial for keeping us supplied with coffee is a worrying trend. The high yields in both countries suggest that there is little opportunity to continue increasing output without expanding the growing area, particularly as the existing coffee trees reach their productive peak. Indeed, production growth in both countries has slowed over the last few years. As global demand for coffee keeps expanding, competition for beans is likely to become more intense, but it's not clear who's going to supply the market. 

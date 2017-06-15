@@ -20,7 +20,7 @@ disableKinds = "RSS"
     hrefTargetBlank = true
 
 [params]
-    description = "A personal blog."
+    description = "A quantitative look at the coffee market."
     themeColor = "theme-base-0d"
     layoutReverse = false
 
