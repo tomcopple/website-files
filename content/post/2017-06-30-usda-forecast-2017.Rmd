@@ -1,0 +1,177 @@
+---
+title: 'The coffee market in 2017: A first look'
+Description: "What can we learn from the USDA's coffee market forecast?"
+date: '2017-06-30'
+slug: 'usda-forecast-2017'
+categories: [Blog]
+tags: [Coffee]
+draft: false
+thumbnail: 'usdaForecast2017.png'
+summaryText: <p>Last week, the United States Department of Agriculture (USDA) released their twice-yearly estimate of global supply and demand of coffee. This estimate contains a forecast for the upcoming 2017/18 coffee year, which starts in October, giving us an indication of where the coffee sector might be going up to September 2018.<p>Obviously, much can change in that time, particularly as weather events become more unpredictable, but there are still some useful morsels to be found in the data.<p><img src="/img/coffee-stocks.png" alt="a stock photo of some coffee stocks" title="a stock photo of coffee stocks"/><p>
+---
+
+```{r setup, include=FALSE}
+library(coffeestats)
+library(tidyverse)
+library(plotly)
+library(leaflet)
+loadUSDA()
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
+```
+
+
+Last week, the United States Department of Agriculture (USDA) released their twice-yearly estimate of global supply and demand of coffee. This estimate contains a forecast for the upcoming 2017/18 coffee year, which starts in October, giving us an indication of where the coffee sector might be going up to September 2018. 
+
+Obviously, much can change in that time, particularly as weather events become more unpredictable, but there are still some useful morsels to be found in the data. 
+
+![a stock photo of coffee stocks](/img/coffee-stocks.png "a stock photo of some coffee stocks")
+
+```{r, echo = FALSE}
+htmltools::HTML('<p class = "message">There are two main sources of publicly available statistics for the coffee sector: the USDA and the ICO (International Coffee Organization). The USDA is generally known for being on the higher side of production estimates, while the ICO is more conservative in its outlook and doesn\'t tend to release forecasts. The truth, as usual, is probably somewhere in between. </p>')
+```
+
+### Main results
+
+In very general terms, next year is not expected to throw up many huge surprises. World production will stay roughly the same on 159.3 million bags while consumption will increase by just over 1% to a record 157.6 million bags. 
+
+```{r, include = FALSE}
+p1 <- usda %>% filter(series %in% c("Production", "Consumption"),
+                      year >= 2002) %>% 
+    group_by(year, series) %>% 
+    summarise(value = sum(value)) %>% 
+    ungroup()
+```
+```{r, echo = FALSE, out.width = "100%", out.height = "380px"}
+plot_ly(p1 %>% group_by(series), x = ~year, y = ~value/1000, 
+        colors = blogColours[1:2], color = ~series,
+        line = list(shape = "spline", smoothing = 0.5),  mode = "lines",
+        text = ~paste0("(", year, ") ", series, ": ", round(value/1000, 1), " million bags"),
+        hoverinfo="text",
+        type = "scatter") %>% 
+     layout(title = "World production & consumption",
+           xaxis = list(title = "", showgrid = FALSE),
+           yaxis = list(title = "Million 60kg bags"),
+           font = list(color = "#515151", family = "Noto Sans, Open Sans"),
+           titlefont = list(color = "#515151", family = "Noto Sans, Open Sans", size = 15),
+           legend = list(orientation="h", xanchor="center", x = 0.5))
+```
+
+However, this lack of change in the world total covers up some interesting dynamics. Firstly, the production of Arabica coffee, as favoured by the specialty coffee sector, is estimated down by nearly 4%, while Robusta, the main source of instant coffee, is up by over 6%. This is mostly due to Brazil entering into an off-year in its biennial cycle, where high output one year is followed by a smaller year as the trees recover.
+
+This drop in Arabica production could help support prices, which have been trading at 16-month lows this month, dragged down by broader commodity price swings and healthy current supply.
+
+The modest increase in coffee demand continues a seven-year streak of ever-higher consumption. Coffee has been on an incredible upward trajectory recently, with the rise of specialty coffee driving higher demand in North America and Europe, but most of the countries with large consumption increases are in East and Southeast Asia, including a huge rise in the Philippines. Brazil, the largest producer and second-largest consuming country, has also been increasing significantly. 
+
+In relative terms, although the USA and the European Union (as a bloc) have both added around 3.5 million bags to their overall coffee consumption, this isn't a massive increase on their previous levels. The increases in East & Southeast Asia, on the other hand, suggest rapidly expanding markets. In fact the largest percentage increases in both consumption *and* production have come from China, although determining the accuracy of these figures would probably need some further study. 
+
+```{r, include = F}
+library(leaflet);library(maps)
+mapDataRaw <- map_data('world')
+
+# Just going to try mean lng/lat? Maybe also median...
+mapData <- mapDataRaw %>% 
+    group_by(region) %>% 
+    summarise(long = median(long), lat = median(lat)) %>% 
+    full_join(
+        x = .,
+        y = usda %>% 
+            filter(year %in% c(2010, 2017), series == "Consumption") %>% 
+            spread(key = year, value=value) %>% 
+            mutate(diff = `2017` - `2010`,
+                   country = case_when(
+                       .$country == "Congo" ~ "Republic of Congo",
+                       .$country == "Congo, DR" ~ "Democratic Republic of the Congo",
+                       .$country == "Cote d'Ivoire" ~ "Ivory Coast",
+                       .$country == "European Union" ~ "Germany",
+                       .$country == "Trinidad and Tobago" ~ "Tobago",
+                       TRUE ~ .$country
+                   ),
+                   diff = ifelse(diff < 0, 0, diff)) %>% 
+            select(region = country, diff)
+    ) %>% 
+    mutate(diff = ifelse(is.na(diff), 0, diff),
+           region = ifelse(region == "Germany", "European Union", region),
+           long = ifelse(region == "USA", -98.6, 
+                         ifelse(region == "Canada", -96.5, long)),
+           lat = ifelse(region == "USA", 39.8,
+                        ifelse(region == "Canada", 62.2, lat))
+           )
+```
+```{r, echo = FALSE, out.width = "100%", out.height = "380px"}
+leaflet(mapData) %>% 
+    addTiles() %>% 
+    setView(lat = 25, lng = 10, zoom = 1) %>%
+    addCircleMarkers(lng = ~long, lat = ~lat, 
+                     radius = ~diff/100, fillColor = blogColours[2],
+                     stroke = FALSE, fillOpacity = 0.5,
+                     label = ~paste0(mapData$region, ": +", format(round(diff/1000, 1), big.mark = ","), " million bags")) %>% 
+    addLegend(
+        position = "topleft",
+        colors = NULL, labels = NULL,
+        title = "Consumption increases since 2010")
+```
+
+### The importance of stocks
+
+One of the main takeaways from the USDA report is how much coffee will be left in warehouses by the end of next year. The report suggests that global stocks will drop to a six-year low of 34 million bags by September 2018. This is important because stocks generally have an inverse correlation with prices. 
+
+Even more importantly, given the increase in consumption, the stocks/use ratio will be coming under pressure. This is the amount of coffee stored in warehouses as expressed in weeks of consumption. According to the USDA estimates, by the end of next year stocks will cover just over 11 weeks of consumption, down from nearly 15 weeks in 2014 and 2015. The last time the stocks/use ratio was so low, in 2010 through 2012, international prices went through the roof. 
+
+```{r, include = FALSE}
+stocksUse <- usda %>% 
+    filter(series %in% c("Opening Stocks", "Consumption"), year >= 2002) %>% 
+    ## Add in 2017 ending stocks as 2018 opening stocks (it's the same thing)
+    bind_rows(., usda %>% 
+                  filter(series == "Ending Stocks", year == 2017) %>% 
+                  mutate(series = "Opening Stocks", year = 2018)) %>% 
+    group_by(series, year) %>% 
+    summarise(value = sum(value, na.rm=TRUE)) %>% 
+    ungroup() %>% 
+    bind_rows(., data.frame(
+        series = "Consumption", year = 2018, 
+        ## Assume a 1% increase in consumption in 2018
+        value = last(filter(., series == "Consumption")$value * 1.01)
+              )) %>% 
+    spread(key = series, value = value, fill = 0) %>% 
+    ## Convert yearly consumption into weekly
+    mutate(Consumption = Consumption / 52,
+           stocks_use = `Opening Stocks` / Consumption,
+           year = lubridate::dmy(paste0("01-10-", year)))
+coffeestats::getFuturePrices(F)
+
+```
+```{r, echo = FALSE, out.width="100%", out.height = "380px"}
+plot_ly() %>% 
+    add_trace(name = "Stocks/use ratio",
+              data = stocksUse, x = ~year, y = ~stocks_use, type = "bar",
+        text = ~paste0("(", lubridate::year(year), ") ", round(stocks_use, 1), " weeks"), 
+        hoverinfo = "text",
+        marker = list(color = blogColours[1]), opacity = 0.6) %>% 
+    add_lines(name = "New York Arabica future prices",
+              data = filter(futurePrices, date >= "2002-10-01", series == "arabica"),
+              text = ~paste0("(", format(date, "%b-%y"), ") ", round(price, 2), " US cents/lb"),
+              hoverinfo = "text",
+              line = list(color = blogColours[2]),
+              x = ~date, y = ~price, yaxis = "y2") %>% 
+    add_lines(name = "London Robusta future prices",
+              data = filter(futurePrices, date >= "2002-10-01", series == "robusta"),
+              text = ~paste0("(", format(date, "%b-%y"), ") ", round(price, 2), " US cents/lb"),
+              hoverinfo = "text",
+              line = list(color = blogColours[3]),
+              x = ~date, y = ~price, yaxis = "y2") %>% 
+    layout(title = "Stocks/use ratio since 2002",
+           xaxis = list(title = ""),
+           yaxis = list(title = "Weeks of coffee stocks", zeroline = FALSE,
+                        range = list(0, 22), tick0 = 0, dtick = 5),
+           yaxis2 = list(title = "Prices (US cents/lb)", side = "right", overlaying = "y",
+                         zeroline = FALSE, showgrid = FALSE, 
+                         range = list(0, 320), tick0=0, dtick=75),
+           font = list(color = "#515151", family = "Noto Sans, Open Sans"),
+           titlefont = list(color = "#515151", family = "Noto Sans, Open Sans", size = 15),
+           legend = list(orientation = "h"),
+           margin = list(r = 80))
+```
+
+### Conclusions
+
+The USDA forecast doesn't raise any immediate causes for alarm, but the warning signs are there. Production is currently predicted to cover demand, but if there are any disruptions over the course of the next 15 months, such as frost, drought or excess rains, then this optimistic view could quickly change. The stocks which are currently providing a buffer against short-term supply fluctuations could quickly evaporate, resulting in a desperate scramble for availability. 
