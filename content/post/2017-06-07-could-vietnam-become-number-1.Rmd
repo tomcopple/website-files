@@ -14,7 +14,7 @@ summaryText: <p>In March of this year, Vietnam made headlines in the coffee indu
 ```{r, include = FALSE}
 coffeestats <- "~/Dropbox/Work/coffeestats"
 blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
-project <- "~/Dropbox/Work/coffeestats/projects/canCoffeeOvertake"
+project <- "~/Dropbox/Work/coffeestats/projects/couldVietnam"
 source("~/R/tomcopple.github.io/scripts/theme_blog.R")
 knitr::opts_chunk$set(message = F, warning = F, error = F)
 library(tidyverse);library(lubridate);library(plotly)
@@ -186,7 +186,7 @@ According to data from the UN Food and Agriculture Organization (FAO), Vietnam r
 top10 <- prodAll %>% na.omit() %>% 
     filter(year == "2016") %>% 
     top_n(n = 10, wt = value) %>% magrittr::extract2('Country')
-pYieldData <- read_csv(file.path(coffeestats, "input/faostat.csv")) %>%
+pYieldData <- read_csv(file.path(coffeestats, "data/faostat.csv")) %>%
     select(country = Area, year = Year, value = Value) %>%
     # Fix spelling
     mutate(country = ifelse(grepl("Viet Nam", country), "Vietnam", country)) %>%

@@ -15,7 +15,8 @@ summaryText: <p>One of the most widely known facts about coffee is that it's the
 ```{r setup, include = FALSE}
 library(tidyverse);library(plotly);library(knitr);library(blogdown)
 library(leaflet);library(rgdal);library(htmltools)
-coffeestats <- "~/Dropbox/Work/coffeestats"
+library(coffeestats)
+setDataDir()
 ```
 
 One of the most widely known facts about coffee is that it's the second most traded commodity in the world, after oil. It's such common knowledge that Google even helpfully points it out. 
@@ -98,7 +99,7 @@ commodities <- data_frame(
 # allCommodities <- purrr::map2_df(commodities$shortName, commodities$hsCode, getCommodity)
 # I'm just going to import from csv for now
 # write_csv(allCommodities, "~/Dropbox/Work/coffeestats/output/allCommodities.csv")
-allCommodities <- read_csv(file.path(coffeestats, "output/allCommodities.csv"))
+allCommodities <- read_csv(file.path(coffeestats, "allCommodities.csv"))
 
 # Summarise by commodity group - get total value per year then average out over period
 allComsGroup <- allCommodities %>% 
@@ -142,7 +143,7 @@ For the purposes of this article, I'm going to use the World Bank lending groups
 
 ```{r, include=F}
 # Download the zip file from here; http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip and unzip into the working directory. 
-worldMap <- readOGR(dsn = path.expand(file.path(coffeestats, "input", "worldmap", "world_shape_file")),
+worldMap <- readOGR(dsn = path.expand(file.path(coffeestats, "worldmap", "world_shape_file")),
                     layer = "TM_WORLD_BORDERS_SIMPL-0.3")
 
 # Need to change some country names
