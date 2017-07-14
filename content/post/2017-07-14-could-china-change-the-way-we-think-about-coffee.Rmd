@@ -1,0 +1,231 @@
+---
+title: Could China change the way we think about coffee?
+description: We need to start including China in our analysis before it's too late. 
+date: '2017-07-14'
+slug: coffee-china
+categories: []
+tags: []
+draft: true
+summaryText: <p>China might not be the first country you think of when it comes to coffee, but its influence is growing. It might not come as a surprise that as China develops it’s drinking more coffee, you might not expect it to be one of the world’s major producers. While data can be hard to come by, it seems that China has been investing significantly in the coffee sector, and could soon be a major player.</p>
+---
+
+```{r setup, include = FALSE}
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse);library(coffeestats);library(plotly);library(lubridate);library(leaflet)
+coffeeChina <- "~/Dropbox/Work/coffeestats/projects/coffeeChina"
+```
+
+China might not be the first country you think of when it comes to coffee, but its influence is growing. While it might not come as a surprise that as China develops it’s drinking more coffee, you might not expect it to be one of the world’s major producers. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. 
+
+```{r, echo = FALSE}
+htmltools::HTML('<p class = "message">Official statistics on coffee in China are few and far between. The International Coffee Organization doesn\'t include China in its public statistics, as they\'re not a member of the Organization. For the purposes of this article, I\'m going to use the newly published US Department of Agriculture figures. But a word of warning, you can normally tell how much of a guess coffee statistics are by the number of zeros on the end, and the USDA numbers for China\'s coffee production have <em>a lot</em> of zeros.</p>')
+```
+
+### They’ve got an awful lot of coffee in China
+
+China has been a producer of coffee for over a hundred years, but historically the volumes have been pretty low. That’s changed recently, particularly as major multinational coffee companies like Nestlé and Starbucks have invested in coffee plantations. Total production by China this year is estimated at 2.2 million bags, which would make them the 13th largest producer worldwide, just beind Nicaragua. This is up from 430,000 bags ten years ago, when they were ranked 27th just ahead of Laos.
+
+Most of the coffee is produced in Yunnan region, better known for its Pu’er tea, and it’s almost entirely Arabica beans. Up until recently, the quality was considered non-specialty, but that also seems to be changing, to the extent that this year a Chinese coffee was used in the US Barista Championship for the first time.
+
+```{r}
+htmltools::HTML("{{< tweet 855567754979557376 >}}{{< tweet 855568117413560321 >}}")
+```
+
+While production in many countries is slowing or falling, China seems to be getting stronger, and now produces more coffee than Costa Rica, El Salvador or Kenya.
+
+### And they're drinking even more
+
+If coffee production in China is going strong, consumption is on another level. Though still a mostly tea-drinking country, coffee has taken off, particularly in the coastal urban areas where a large population has an increasing disposable income. Coffee demand is growing at more than 10% per year, and is now estimated at 3.2 million bags, just slightly less than the UK.
+
+Historically, consumption in China has mostly been imported Robusta beans, used in instant coffee and ready-to-drink products like this intriguing "Durian" coffee (a Malaysian product, imported to China):
+
+![durian-coffee](/img/durian-coffee-2.jpg "mmm, durian coffee")
+
+However, as the coffee market develops, tastes are changing. China is increasingly becoming a consumer of specialty coffee, with several reports that the highest rated coffee at auction are being sold to Chinese consumers. 
+
+One proxy for this evolution is the growth of Starbucks in China. As can be seen in the map below, China is a major growth market for Starbucks.  
+
+```{r, include = FALSE}
+map2 <- read_csv(file.path(coffeeChina, "map2.csv"))
+```
+```{r, out.width = "100%", out.height = "380px"}
+map2 %>% 
+    filter(count >= 10) %>% 
+    spread(key = year, value = count, fill = 0) %>% 
+    mutate(fillColor = ifelse(CountryCode == "CN", blogColours[2], blogColours[5]),
+           fillOpacity = ifelse(CountryCode == "CN", 0.6, 0.4)) %>% 
+    leaflet() %>% 
+    addTiles() %>% 
+    setView(lat = 25, lng = 10, zoom = 1) %>%
+    addCircleMarkers(lng = ~lng, lat = ~lat, radius = ~`2013`/8, stroke = FALSE, group = "2013",
+                     label = ~paste0(City, ": ", `2013`), 
+                     popup = ~paste0(City, ": ", `2013`), fillColor = ~fillColor, fillOpacity = ~fillOpacity) %>% 
+    addCircleMarkers(lng = ~lng, lat = ~lat, radius = ~`2014`/8, stroke = FALSE, group = "2014",
+                     label = ~paste0(City, ": ", `2014`), 
+                     popup = ~paste0(City, ": ", `2014`), fillColor = ~fillColor, fillOpacity = ~fillOpacity) %>% 
+    addCircleMarkers(lng = ~lng, lat = ~lat, radius = ~`2015`/8, stroke = FALSE, group = "2015",
+                     label = ~paste0(City, ": ", `2015`), 
+                     popup = ~paste0(City, ": ", `2015`), fillColor = ~fillColor, fillOpacity = ~fillOpacity) %>% 
+    addCircleMarkers(lng = ~lng, lat = ~lat, radius = ~`2016`/8, stroke = FALSE, group = "2016",
+                     label = ~paste0(City, ": ", `2016`), 
+                     popup = ~paste0(City, ": ", `2016`), fillColor = ~fillColor, fillOpacity = ~fillOpacity) %>% 
+    addLayersControl(baseGroups = ~c('2016', '2015', '2014', '2013'),
+                     options = layersControlOptions(collapsed = FALSE)) %>% 
+    addLegend(
+        position = "topleft",
+        colors = NULL, labels = NULL,
+        title = "Starbucks stores worldwide, grouped by city (China in red)")
+```
+
+Starbucks opened their first store in the Chinese mainland in 1999, and since 2012 has opened on average more than one new store every day. China is now Starbucks's largest market outside of the US, and with the number of stores expected to double by 2021, ex-CEO Howard Schultz expects China to be a larger market than the US in the next four years. By the end of last year, there were more than 40 cities in China with over 10 Starbucks stores (I know this because I had to transcribe all of them by hand): 
+
+```{r, echo = TRUE, eval = FALSE}
+City = case_when(
+    .$City == "三亚市" ~ "Sanya",
+    .$City == "上海市" ~ "Shanghai",
+    .$City == "北京市" ~ "Beijing",
+    .$City == "杭州市" ~ "Hangzhou",
+    .$City == "深圳市" ~ "Shenzhen",
+    .$City == "广州市" ~ "Guangzhou",
+    .$City == "成都市" ~ "Chengdu",
+    .$City == "苏州市" ~ "Suzhou",
+    .$City == "南京市" ~ "Nanjing",
+    .$City == "武汉市" ~ "Wuhan",
+    .$City == "宁波市" ~ "Ningbo",
+    .$City == "天津市" ~ "Tianjin",
+    .$City == "西安市" ~ "Xi'an",
+    .$City == "重庆市" ~ "Chongqing",
+    .$City == "佛山市" ~ "Foshan",
+    .$City == "无锡市" ~ "Wuxi",
+    .$City == "东莞市" ~ "Dongguan",
+    .$City == "青岛市" ~ "Qingdao",
+    .$City == "长沙市" ~ "Changsha",
+    .$City == "大连市" ~ "Dalian",
+    .$City == "常州市" ~ "Changzhou",
+    .$City == "沈阳市" ~ "Shenyang",
+    .$City == "厦门市" ~ "Xiamen",
+    .$City == "昆明市" ~ "Kunming",
+    .$City == "福州市" ~ "Fuzhou",
+    .$City == "温州市" ~ "Wenzhou",
+    .$City == "南通市" ~ "Nantong",
+    .$City == "合肥市" ~ "Hefei",
+    .$City == "郑州市" ~ "Zhengzhou",
+    .$City == "济南市" ~ "Jinan",
+    .$City == "哈尔滨" ~ "Harbin",
+    .$City == "昆山市" ~ "Kunshan",
+    .$City == "绍兴市" ~ "Shaoxing",
+    .$City == "珠海市" ~ "Zhuhai",
+    .$City == "泉州市" ~ "Quanzhou",
+    .$City == "嘉兴市" ~ "Jiaxing",
+    .$City == "南宁市" ~ "Nanning",
+    .$City == "湖州市" ~ "Huzhou",
+    .$City == "南昌市" ~ "Nanchang",
+    .$City == "台州市" ~ "Taizhou",
+    .$City == "扬州市" ~ "Yangzhou",
+    .$City == "金华市" ~ "Jinhua",
+    .$City == "中山市" ~ "Zhongshan",
+    .$City == "长春市" ~ "Changchun"
+)
+```
+
+To summarise, this means that in global terms, production and consumption of coffee in China have typically roughly cancelled each other out, leaving a marginal effect on the global coffee balance, as can be seen below. The latest figures suggest that’s now changing, as demand consistently outstrips supply.
+
+```{r, out.width = "100%", out.height = "380px"}
+coffeestats::loadUSDA()
+usda %>% 
+    filter(series %in% c("Production", "Consumption"), country == "China") %>% 
+    mutate(value = value/1000) %>% 
+    spread(key = series, value = value) %>% 
+    mutate(net = Production - Consumption) %>% 
+    plot_ly(x = ~year) %>% 
+    add_bars(name = "Balance", y = ~net, yaxis = "y2",
+             opacity = 0.5, marker = list(color = blogColours[3]),
+             text = ~paste0("(", year, ") Balance: ", round(net, 1), "m bags"),
+             hoverinfo = "text") %>% 
+    add_lines(name = "Production", y = ~Production,
+              line = list(color = blogColours[1]),
+             text = ~paste0("(", year, ") Production: ", round(Production, 1), "m bags"),
+             hoverinfo = "text") %>% 
+    add_lines(name = "Consumption", y = ~Consumption,
+              line = list(color = blogColours[2]),
+             text = ~paste0("(", year, ") Consumption: ", round(Consumption, 1), "m bags"),
+             hoverinfo = "text") %>% 
+    layout(
+        title = "Coffee supply & demand in China",
+        xaxis = list(title = ""),
+        yaxis = list(title = "Production/Consumption",
+                     zeroline = FALSE, 
+                     range = list(0, 4), tick0=0, dtick=1),
+        yaxis2 = list(title = "Net balance",
+                      side = "right", overlaying = "y",
+                      zeroline = TRUE, showgrid = FALSE,
+                      range = list(-1, 1), tick0=-1, dtick=0.5),
+        font =  list(color = "#515151", family = "Noto Sans"),
+        titlefont = list(color = "#515151", family = "Noto Sans", size = 15),
+        legend = list(orientation = "h"),
+        margin = list(r = 80))
+```
+
+### Why does this matter?
+
+The increasing importance of China to the coffee market is undeniable, and while it’s positive evidence of a dynamic market, I’d like to bring up a note of caution. It comes from looking at some other commodities were China is already a major player.
+
+In May of this year, some economic news coming out of China suggested softer than expected economic growth, and this led to widespread downturns in major commodity markets. Coffee was largely exempt from this move (though it was already falling anyway), but it’s not hard to envision a scenario where Chinese economic news starts to have a direct impact on coffee prices.
+
+This is important, because coffee is already subject to influences outside of its control. Over the last 2 1/2 years, the single most important factor affecting Arabica prices hasn’t been the weather in Brazil, or availability from Central America, but rather the exchange rate between the US dollar and the Brazilian real. As can be seen below, the two have largely tracked each other pretty closely, with any sudden movements in the exchange rate being reflected in coffee prices. (The logic being that if the US dollar strengthens, then Brazilian farmers will get more local currency for their produce, and will release more coffee to the international market, hence depressing prices). This means that policy decisions by the US Federal Reserve or corruption charges against Brazilian politicians now directly affect the income of over 25 million coffee farmers worldwide.
+
+```{r, include = FALSE, cache = TRUE}
+# Compare BRL/USD with futures prices
+library(Quandl)
+coffeestats::getFuturePrices(F)
+exrate <- Quandl(code = "BOE/XUDLB8KL", 
+                 start_date = Sys.Date() - years(4)) %>%
+    arrange(Date) %>%
+    select(Date, BRL = Value) %>% 
+    as_data_frame()
+
+brl <- full_join(
+    x = filter(futurePrices, series == "arabica", date >= min(exrate$Date)),
+    y = rename(exrate, date = Date)
+) %>% 
+    select(-series)
+```
+```{r, echo = FALSE, out.width = "100%", out.height = "380px"}
+library(scales)
+brl %>%
+    filter(date >="2015-01-01") %>% 
+    na.omit() %>% 
+    mutate(BRL = 1/BRL) %>% 
+    plot_ly(x = ~date) %>% 
+    add_lines(name = "Coffee prices", y = ~price, line = list(color = blogColours[1]),
+              yaxis = "y2",
+              text = ~paste0(scales::ordinal(lubridate::day(date)),
+                             format(date, " %b %Y"), ": R$", round(price, 2)),
+              hoverinfo = "text") %>%
+    add_lines(name = "USD/BRL exchange rate", y = ~BRL, 
+              line = list(color = blogColours[2]),
+              text = ~paste0(scales::ordinal(lubridate::day(date)),
+                             format(date, " %b %Y"), ": ", round(BRL, 2), " US cents/lb"),
+              hoverinfo = "text") %>% 
+    layout(
+        title = "Coffee prices and the Brazilian real exchange rate",
+        xaxis = list(title = ""),
+        yaxis = list(title = "USD/BRL exchange rate", zeroline = FALSE, 
+                     range = list(0.2, 0.4), tick0 = 0.2, dtick = 0.05),
+        yaxis2 = list(title = "Arabica futures prices (US cents/lb)", 
+                      side = "right", overlaying = "y",
+                      zeroline = FALSE, showgrid = FALSE,
+                      range = list(100, 200), tick0=100, dtick = 25),
+        font = list(color = "#515151", family = "'Noto Sans', verdana, arial"),
+        titlefont = list(size = 15),
+        legend = list(orientation = "h"),
+        margin = list(r = 80, l = 80))
+
+```
+
+Adding another exogenous factor to this market is only likely to further increase the volatility already plaguing the coffee market.
+
+### Conclusions
+
+All in all, it's clear to me that we need to spend more time including China when we talk about coffee. The industry is already discussing how to ensure that there is enough coffee supply to satisfy a growing market, but an extra 4 to 8 million bags of disappearance from China could really impact that equation. This trend has somewhat slipped under the radar given their relatively neutral net impact on the global balance sheet, but that situation is now changing as consumption pulls away from production, and it's time to pay attention. 
