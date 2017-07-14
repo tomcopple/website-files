@@ -244,3 +244,10 @@ caption {
   }
 
 }
+
+/* Just trying something */
+pre.r {
+  overflow-x: auto;
+  overflow-y: scroll;
+  max-height: 150px;
+}
