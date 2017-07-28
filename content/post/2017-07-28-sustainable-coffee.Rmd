@@ -140,7 +140,7 @@ Furthermore, it's not clear that the incentives offered by the various certifyin
 Finally, despite the increasing coverage of certification standards, coffee production is still not a profitable activity for many growers. At the recent World Coffee Producers Forum in Colombia, the final declaration stated that:
 
 > `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")` the profitability of coffee farming in many producing countries faces a critical situation, even going through periods of losses... lower profitability has led a significant percentage of coffee producers in the world to live in poverty... even if development of specialty coffee in the last decades has generated some premiums to producers, these have not been enough to offset the costs associated with certifications. `r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")`
-  
+   
 ### Conclusions
 
 The arguments for and against certification to promote coffee sustainability are long and complicated, and this blog post is not meant to address all of them. However, while certified standards are certainly a core feature of the current coffee market, more so than in any other agricultural commodity, it's not a solution to many of the integral problems in the sector. 
