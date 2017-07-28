@@ -9,16 +9,20 @@
         {{ range .Data.Pages }}
         <div class = "media tagRow">
           <div class = "media-body">
+            {{ if isset .Params "thumbnail" }}
+            <a href = "{{ .Permalink }}">
+              <img src = "/img/thumbnails/{{ .Params.thumbnail }}" alt = "" class="img-thumbnail img-fluid">
+            </a>
+            {{ end }}
             <h5><a href="{{ .Permalink }}">{{ .Title }}</a></h5>
             <p class = 'post-date'><em>{{ .Date.Format "Mon, Jan 2, 2006" }}</em></p>
+
             <p>{{ .Description }}</p>
+
+
           </div>
 
-          {{ if isset .Params "thumbnail" }}
-          <a href = "{{ .Permalink }}">
-            <img src = "/img/thumbnails/{{ .Params.thumbnail }}" alt = "">
-          </a>
-          {{ end }}
+
         </div>
         {{ end }}
       </div>

@@ -155,6 +155,7 @@ a:hover#tags {
   /*border: 1px solid black;*/
   max-height: 12rem;
   float: right;
+  margin-left: 1rem;
 }
 
 /* Message class */
@@ -242,6 +243,16 @@ caption {
     max-width: 170px;
     max-height: 170px;
   }
+
+/* Want small thumbnail images on phone view */
+  .tagRow img {
+    /*border: 1px solid black;*/
+    max-height: 7rem;
+    /*float: right;*/
+    /*margin-left: 1rem;*/
+  }
+
+
 
 }
 
