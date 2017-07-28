@@ -1,4 +1,5 @@
 print("Loading custom Rprofile")
 library(blogdown)
 options(blogdown.use.rmd = TRUE, servr.daemon = TRUE, blogdown.rmd = TRUE)
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
 print("Should be finished")

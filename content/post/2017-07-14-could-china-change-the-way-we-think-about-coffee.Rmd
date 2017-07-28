@@ -3,10 +3,11 @@ title: Could China change the way we think about coffee?
 description: We need to start including China in our analysis before it's too late. 
 date: '2017-07-14'
 slug: coffee-china
-categories: []
-tags: []
-draft: true
-summaryText: <p>China might not be the first country you think of when it comes to coffee, but its influence is growing. It might not come as a surprise that as China develops it’s drinking more coffee, you might not expect it to be one of the world’s major producers. While data can be hard to come by, it seems that China has been investing significantly in the coffee sector, and could soon be a major player.</p>
+thumbnail: coffeeChina.png
+categories: [Blog]
+tags: [Coffee]
+draft: false
+summaryText: <p>China might not be the first country you think of when it comes to coffee, but its influence is growing. It's no surprise that as China develops it's drinking more coffee, but its potential to be one of the world's major producers is less well known. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. </p><p><a href="http://tomcopple.coffee/2017/07/14/coffee-china/"><img src="/img/coffeeChinaBanner.png" alt="coffee-china-banner" title="Could China change the way we think about coffee?"/></a><p>
 ---
 
 ```{r setup, include = FALSE}
@@ -16,7 +17,7 @@ library(tidyverse);library(coffeestats);library(plotly);library(lubridate);libra
 coffeeChina <- "~/Dropbox/Work/coffeestats/projects/coffeeChina"
 ```
 
-China might not be the first country you think of when it comes to coffee, but its influence is growing. While it might not come as a surprise that as China develops it’s drinking more coffee, you might not expect it to be one of the world’s major producers. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. 
+China might not be the first country you think of when it comes to coffee, but its influence is growing. It's no surprise that as China develops it's drinking more coffee, but its potential to be one of the world's major producers is less well known. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. 
 
 ```{r, echo = FALSE}
 htmltools::HTML('<p class = "message">Official statistics on coffee in China are few and far between. The International Coffee Organization doesn\'t include China in its public statistics, as they\'re not a member of the Organization. For the purposes of this article, I\'m going to use the newly published US Department of Agriculture figures. But a word of warning, you can normally tell how much of a guess coffee statistics are by the number of zeros on the end, and the USDA numbers for China\'s coffee production have <em>a lot</em> of zeros.</p>')
@@ -42,7 +43,7 @@ Historically, consumption in China has mostly been imported Robusta beans, used 
 
 ![durian-coffee](/img/durian-coffee-2.jpg "mmm, durian coffee")
 
-However, as the coffee market develops, tastes are changing. China is increasingly becoming a consumer of specialty coffee, with several reports that the highest rated coffee at auction are being sold to Chinese consumers. 
+However, as the coffee market develops, tastes are changing. China is increasingly becoming a consumer of specialty coffee, with several reports that the highest rated coffees at auction are frquently being sold to Chinese consumers. 
 
 One proxy for this evolution is the growth of Starbucks in China. As can be seen in the map below, China is a major growth market for Starbucks.  
 
@@ -73,9 +74,10 @@ map2 %>%
     addLayersControl(baseGroups = ~c('2016', '2015', '2014', '2013'),
                      options = layersControlOptions(collapsed = FALSE)) %>% 
     addLegend(
-        position = "topleft",
+        position = "bottomleft",
         colors = NULL, labels = NULL,
-        title = "Starbucks stores worldwide, grouped by city (China in red)")
+        title = htmltools::HTML("<p>Starbucks stores worldwide, grouped by city (China in red)</p><small><em>Data via <a href='https://github.com/chrismeller/StarbucksLocations' target = '_blank'>Chris Meller</a>")
+    )
 ```
 
 Starbucks opened their first store in the Chinese mainland in 1999, and since 2012 has opened on average more than one new store every day. China is now Starbucks's largest market outside of the US, and with the number of stores expected to double by 2021, ex-CEO Howard Schultz expects China to be a larger market than the US in the next four years. By the end of last year, there were more than 40 cities in China with over 10 Starbucks stores (I know this because I had to transcribe all of them by hand): 
@@ -169,7 +171,7 @@ usda %>%
 
 ### Why does this matter?
 
-The increasing importance of China to the coffee market is undeniable, and while it’s positive evidence of a dynamic market, I’d like to bring up a note of caution. It comes from looking at some other commodities were China is already a major player.
+The increasing importance of China to the coffee market is undeniable, and while it’s positive evidence of a dynamic market, I’d like to bring up a note of caution. It comes from looking at some other commodities where China is already a major player.
 
 In May of this year, some economic news coming out of China suggested softer than expected economic growth, and this led to widespread downturns in major commodity markets. Coffee was largely exempt from this move (though it was already falling anyway), but it’s not hard to envision a scenario where Chinese economic news starts to have a direct impact on coffee prices.
 
@@ -201,12 +203,12 @@ brl %>%
     add_lines(name = "Coffee prices", y = ~price, line = list(color = blogColours[1]),
               yaxis = "y2",
               text = ~paste0(scales::ordinal(lubridate::day(date)),
-                             format(date, " %b %Y"), ": R$", round(price, 2)),
+                             format(date, " %b %Y"), ": ", round(price, 2), " US cents/lb"),
               hoverinfo = "text") %>%
     add_lines(name = "USD/BRL exchange rate", y = ~BRL, 
               line = list(color = blogColours[2]),
               text = ~paste0(scales::ordinal(lubridate::day(date)),
-                             format(date, " %b %Y"), ": ", round(BRL, 2), " US cents/lb"),
+                             format(date, " %b %Y"), ": R$", round(BRL, 2)),
               hoverinfo = "text") %>% 
     layout(
         title = "Coffee prices and the Brazilian real exchange rate",

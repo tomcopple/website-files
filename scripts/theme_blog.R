@@ -1,4 +1,5 @@
 # Rough theme for blogpost graphs (ggplot)
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
 theme_blog <- function() {
     theme(
         text = element_text(
