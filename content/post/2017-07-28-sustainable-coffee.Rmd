@@ -25,7 +25,7 @@ This link between "sustainability" and certification standards is just one inter
    
 ### Coffee leading the way
 
-> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")`Today, the coffee sector is poised to become the first sustainable commodity with at least 25% of its production compliance with one or several sustainability standards.`r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")` 
+> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")`Today, the coffee sector is poised to become the first sustainable commodity with at least 25% of its production compliant with one or several sustainability standards.`r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")` 
 
 The ITC report collects figures on area, production and number of producers per country for each standard and agricultural commodity. The aggregate numbers for each commodity are shown below. The data are not comprehensive, for example there are missing numbers for the number of oil palm producers or the output of certified forestry, but there are some general trends.
 
@@ -70,11 +70,11 @@ subplot(p1, p2, p3, shareY = TRUE) %>%
     )
 ```
 
-The graph above shows the aggregated totals of certified production by commodity (excluding forestry and oil palm), giving totals for the number of producers covered, th earea and the volume of production. The most interesting series is probably the number of producers covered by some kind of certification body. 
+The graph above shows the aggregated totals of certified production by commodity (excluding forestry and oil palm), giving totals for the number of producers covered, the area and the volume of production. The most interesting series is probably the number of producers covered by some kind of certification body. 
 
 Coffee is clearly leading the way here, with a total of nearly 2 million producers, followed by cotton, tea and cocoa. Coffee also covers the most area, reinforcing the conclusion made by the ITC that coffee is the most advanced commodity in terms of sustainability initiatives. 
 
-Looking at the geograhical spread of certified coffee producers, the coverage is quite representative, with producers in most of the so-called coffee belt. It's noticeable that while much of the large production volumes come from South America, the concentration of producers seems higher in sub-Saharan Africa. This corresponds with the producers in Africa are more likely to be smallholder operations, compared to the larger estates found in Brazil. 
+Looking at the geograhical spread of certified coffee producers, the coverage is quite representative, with most producers in the so-called coffee belt. It's noticeable that while much of the large production volumes come from South America, the concentration of producers seems higher in sub-Saharan Africa. This corresponds with the idea that producers in Africa are more likely to be smallholder operations, compared to the larger estates found in Brazil. 
 
 ```{r, include = FALSE}
 library(leaflet);library(leaflet.minicharts);library(maps);library(coffeestats);library(htmltools);library(htmlwidgets)
@@ -133,14 +133,14 @@ leaflet(mapData) %>%
 
 While the relatively wide coverage of certification standards in the coffee sector could be seen as a positive development, that's not entirely the whole story. 
 
-Firstly, there's little evidence that certification actually improves farmer welfare on a regular basis. There have been `r htmltools::HTML("<a href='https://www.soas.ac.uk/news/newsitem93228.html' target = '_blank'>numerous</a>")` `r htmltools::HTML("<a href = 'https://ssir.org/articles/entry/the_problem_with_fair_trade_coffee' target = '_blank'>studies</a>")` that suggest the benefits of certification are often overstated, while a recent `r htmltools::HTML("<a href='https://www.comunicaffe.com/future-of-coffee-depends-on-adequate-income-for-farmers-study-shows/' target = '_blank'>research report</a>")` sponsored by Fairtrade found that many coffee farmers struggle to make ends meet, and that that certification alone is not enough. 
+Firstly, there's little evidence that certification actually improves farmer welfare on a regular basis. There have been `r htmltools::HTML("<a href='https://www.soas.ac.uk/news/newsitem93228.html' target = '_blank'>numerous</a>")` `r htmltools::HTML("<a href = 'https://ssir.org/articles/entry/the_problem_with_fair_trade_coffee' target = '_blank'>studies</a>")` that suggest the benefits of certification are often overstated, while a recent `r htmltools::HTML("<a href='https://www.comunicaffe.com/future-of-coffee-depends-on-adequate-income-for-farmers-study-shows/' target = '_blank'>research report</a>")` sponsored by Fairtrade found that many coffee farmers struggle to make ends meet, and that certification alone is not enough. 
 
-Furthermore, it's not clear that the incentives offered by the various certifying agencies are always beneficial to the farmer. An organically certified coffee producer, for example, has committed to not using synthetic fertilisers or pesticides on their crop, but there's no reason to infer that they will be better off because of this. They could easily have lower yields or be more susceptible to pests and disease. Peru is one of the largest organic coffee producers, but is currently struggling with a fungus outbreak which has currently reduced its output by nearly a third. Brazil banned the pesticide *endosulfan* in 2013, and is now facing a re-emergence of the berry borer beetle (though this ban is probably for the best, endofulfan really does seem quite nasty). 
+Furthermore, it's not clear that the incentives offered by the various certifying agencies are always beneficial to the farmer. An organically certified coffee producer, for example, has committed to not using synthetic fertilisers or pesticides on their crop, but there's no reason to infer that they will be better off because of this. They could easily have lower yields or be more susceptible to pests and disease. Peru is one of the largest organic coffee producers, but is currently struggling with a fungus outbreak which has reduced its output by nearly a third. Brazil banned the pesticide *endosulfan* in 2013, and is now facing a re-emergence of the berry borer beetle (though this ban is probably for the best, endofulfan really does seem quite nasty). 
 
 Finally, despite the increasing coverage of certification standards, coffee production is still not a profitable activity for many growers. At the recent World Coffee Producers Forum in Colombia, the final declaration stated that:
 
-> profitability of coffee farming in many producing countries faces a critical situation, even going through periods of losses... lower profitability has led a significant percentage of coffee producers in the world to live in poverty... even if development of specialty coffee in the last decades has generated some premiums to producers, these have not been enough to offset the costs associated with certifications. 
-
+> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")` the profitability of coffee farming in many producing countries faces a critical situation, even going through periods of losses... lower profitability has led a significant percentage of coffee producers in the world to live in poverty... even if development of specialty coffee in the last decades has generated some premiums to producers, these have not been enough to offset the costs associated with certifications. `r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")`
+  
 ### Conclusions
 
 The arguments for and against certification to promote coffee sustainability are long and complicated, and this blog post is not meant to address all of them. However, while certified standards are certainly a core feature of the current coffee market, more so than in any other agricultural commodity, it's not a solution to many of the integral problems in the sector. 
