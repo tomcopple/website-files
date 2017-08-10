@@ -1,0 +1,143 @@
+---
+title: Will specialty coffee save African coffee production?
+description: We're going to need a bigger something
+date: '2017-08-11'
+slug: coffee-africa
+categories: [Blog]
+tags: [Coffee]
+draft: true
+summaryText: <p>
+thumbnail: NULL
+---
+
+```{r setup, include = FALSE}
+blogColours <- c("#619fb5", "#ef8066", "#ffcb90", "#70c793", "#7882c0")
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse);library(coffeestats);library(plotly)
+coffeeAfrica <- "~/Dropbox/Work/coffeestats/projects/coffeeAfrica"
+```
+
+An article in Bloomberg last week called *Hip Coffee at $4 a Cup Revives African Industry Left Behind* observed that the growing interest in niche, single-origin coffees is helping to revive the African coffee sector:
+
+> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")`Customers willing to pay a premium for African brews, known for their floral, fruity flavors, are driving purchases of coffee from the continent where the drink is ssaid to have originated. `r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")`
+
+This spurred a number of similar articles to make ever more optimistic claims like [Third Wave Coffee Could Keep Africa's Smaller Growers in Business](http://www.foodandwine.com/news/coffee-sales-african-economy), [African Coffee On The Rise Thanks To Specialty Coffee](http://sprudge.com/african-coffee-on-the-rise-thanks-to-specialty-coffee-124468.html) and, my personal favourite, [Hipster Demand for Fancy Coffee Is Really Helping Africa's Farmers](http://www.grubstreet.com/2017/08/report-african-coffee-industry-rebounding.html). 
+
+Before us fancy coffee drinkers get too self-congratulatory, it's worth looking at the situation in a little more detail. 
+
+### Background/Context/History etc
+
+As the Bloomberg article rightly points out, the African coffee sector has not been thriving in recent years. Total production this year was just over 16 million bags, little changed on its volume in 1990. At the same time, most other regions have increased their output, particularly countries in Asia. 
+
+If we go back further, we can see that the share of coffee exports originating in Africa have massively tailed off, from over a third of the world total in 1973, when 4 countries from Africa were among the world's top ten producers, to under 10% today. 
+
+```{r, include = FALSE}
+coffeestats::loadUSDA()
+cont <- read_csv(file.path(coffeestats, "country-list.csv")) %>% 
+    rename(country = Country)
+
+graph1 <- usda %>% 
+    left_join(y = cont) %>% 
+    na.omit() %>% 
+    filter(series == "Exports", value != 0, Type == "Exporting") %>% 
+    group_by(Continent, year) %>% 
+    summarise(value = sum(value, na.rm = TRUE)) %>% 
+    group_by(year) %>% 
+    mutate(perc = 100*value/sum(value, na.rm = TRUE)) %>% 
+    select(-value) %>% 
+    spread(key = Continent, value = perc, fill = 0) %>% 
+    ungroup()
+```
+```{r, out.width = "100%", out.height = "380px", echo = FALSE}
+plot_ly(graph1, x = ~year, fill = "tozeroy") %>% 
+     add_lines(name = "Asia", y = ~AO, 
+              line = list(color = blogColours[2], shape = "spline", smoothing = 0.7),
+                            fillcolor = paste0(blogColours[2], "0D"),
+
+              text = ~paste0("(", year, ") Asia: ", round(AO, 1), "%"), hoverinfo = "text") %>% 
+    add_lines(name = "Central America", y = ~CA, 
+              line = list(color = blogColours[3], shape = "spline", smoothing = 0.7),
+                            fillcolor = paste0(blogColours[3], "0D"),
+
+              text = ~paste0("(", year, ") Central America: ", round(CA, 1), "%"), hoverinfo = "text") %>% 
+    add_lines(name = "South America", y = ~SA, 
+              line = list(color = blogColours[4], shape = "spline", smoothing = 0.7),
+                            fillcolor = paste0(blogColours[4], "0D"),
+
+              text = ~paste0("(", year, ") South America: ", round(SA, 1), "%"), hoverinfo = "text") %>% 
+    add_lines(name = "Africa", y = ~AF, 
+              line = list(color = blogColours[1], shape = "spline", smoothing = 0.7),
+              fillcolor = paste0(blogColours[1], "1A"),
+              text = ~paste0("(", year, ") Africa: ", round(AF, 1), "%"), hoverinfo = "text") %>% 
+   add_annotations(x = 0, y = -0.1, 
+                    xref = "paper", yref = "paper",
+                    showarrow = F,
+                    xanchor = "left", yanchor = "top",
+                    borderpad = 0, borderwidth = 0,
+                    font = list(size = 10),
+                    text = "<i>Source: USDA</i>") %>%
+    layout(
+        title = "Share of world coffee exports by region",
+        xaxis = list(title = "", showgrid = FALSE),
+        yaxis = list(title = "%", zeroline = FALSE),
+        font = list(color = "#515151", family = "'Noto Sans', verdana, arial"),
+        titlefont = list(size = 15),
+        margin = list(l = 40, b = 50)
+    )
+```
+
+There are many reasons for this decline...
+
+### Situation today?
+
+Is the rise of specialty coffee really driving a resurgence in African coffee? One of the most successful producers is Uganda, who have nearly doubled production since 1990. But Uganda is mostly a Robusta producer, and unlikely to be selling to the specialty market. Output from Kenya, on other hand, is just half of its level 25 years ago, as are smaller Arabica producers like Burundi and Rwanda. 
+
+The strongest case for this argument might be Ethiopia... large increase in the 2000s, and a popular origin for specialty coffee.
+But - difficulties with ECX, large increase in domestic consumption (potential for others)?
+
+```{r, message = FALSE, warning = FALSE}
+coffeestats::loadICOhistorical()
+icoData %>% 
+    left_join(y = cont) %>% 
+    filter(series == "production", Continent == "AF") %>% 
+    group_by(country) %>% 
+    plot_ly(x = ~year, y = ~value, type = "bar", color = ~country) %>% 
+    layout(barmode = "stack")
+usda %>% 
+    left_join(y = cont) %>% 
+    filter(series == "Consumption", Continent == "AF", Type == "Exporting", year >= 1990) %>% 
+    group_by(country) %>% 
+    plot_ly(x = ~year, y = ~value, type = "bar", color = ~country) %>% 
+    layout(barmode = "stack")
+```
+
+### Where do the benefits go?
+
+The increased interest in single-origin coffee might have the potential to raise demand for African coffee, but need to be careful becoming over-confident in ascribing any benefits from this. The fact remains that the vast majority of value in the coffee sector comes in the processing and retail of coffee, which mostly occurs in non-producing countries. The single largest exporter of roasted coffee in the world is Germany. In fact, according to customs data from Eurostat, the value of coffee exported by the European Union **to** Africa often exceeds that of coffee imported **from** Africa. 
+
+![euro-africa-graph](/img/euro-africa-graph.svg)
+
+```{r, eval = FALSE}
+source("~/R/tomcopple.github.io/scripts/theme_blog.R")
+
+euroAfGraph <- read_csv(file.path(coffeeAfrica, "euroAfGraph.csv"))
+ggplot(euroAfGraph, aes(x = PERIOD)) +
+    geom_line(aes(y = Y, group = SERIES, color = SERIES)) +
+    geom_ribbon(aes(ymin = YMIN, ymax = YMAX, group = SERIES, fill = SERIES), show.legend = FALSE, alpha = 0.5) +
+    scale_color_manual("", values = blogColours, labels = c("Exports", "Imports")) +
+    scale_fill_manual("", values = blogColours) +
+    theme_blog() +
+    labs(title = "Value of coffee traded between EU and Africa", x = NULL, y = "Million €") +
+    theme(legend.key = element_blank(),
+          text = element_text(family = "Noto Sans", color = "#515151"))
+# svg(file.path(coffeeAfrica, "euroAfGraph.svg"), width = 15, height = 7)
+# dev.off()
+```
+
+
+### Conclusions
+
+*  Specialty coffee won't save African production if all the value is captured in importing countries. 
+*  Opportunity for exports to rise, but doesn't seem to be happening yet?
+*  Any chance of domestic consumption increasing to provide alternative market?
+
