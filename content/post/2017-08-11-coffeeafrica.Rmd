@@ -1,13 +1,13 @@
 ---
-title: Will specialty coffee save African coffee production?
-description: We're going to need a bigger something
+title: Will the future of African coffee be found in specialty?
+description: It's going to take more than just flat whites. 
 date: '2017-08-11'
 slug: coffee-africa
 categories: [Blog]
 tags: [Coffee]
-draft: true
-summaryText: <p>
-thumbnail: NULL
+draft: false
+summaryText: <p>An article in Bloomberg last week called <a href = 'https://www.bloomberg.com/news/articles/2017-08-01/trendy-coffee-at-4-a-cup-revives-african-industry-left-behind-j5u6te3n' target = '_blank'>Hip Coffee at $4 a Cup Revives African Industry Left Behind</a> observed that the growing interest in niche, single-origin coffees is helping to revive the African coffee sector:</p><blockquote class='blockquote'><p><i class = 'fa fa-quote-left' aria-hidden = 'true'></i>  Customers willing to pay a premium for African brews, known for their floral, fruity flavors, are driving purchases of coffee from the continent where the drink is said to have originated. <i class = 'fa fa-quote-right' aria-hidden = 'true'></i></p></blockquote><p>This spurred a number of similar articles to make ever more optimistic claims like <a href = 'http://www.foodandwine.com/news/coffee-sales-african-economy' target = '_blank'>Third Wave Coffee Could Keep Africa's Smaller Growers in Business</a>, <a href='http://sprudge.com/african-coffee-on-the-rise-thanks-to-specialty-coffee-124468.html' target='_blank'>African Coffee On The Rise Thanks To Specialty Coffee</a> and, my personal favourite, <a href='http://www.grubstreet.com/2017/08/report-african-coffee-industry-rebounding.html' target = '_blank'>Hipster Demand for Fancy Coffee Is Really Helping Africa's Farmers</a>.</p><p>Before us fancy coffee drinkers get too self-congratulatory, it's worth looking at the situation in a little more detail.</p>
+thumbnail: coffeeAfrica.png
 ---
 
 ```{r setup, include = FALSE}
@@ -17,19 +17,19 @@ library(tidyverse);library(coffeestats);library(plotly)
 coffeeAfrica <- "~/Dropbox/Work/coffeestats/projects/coffeeAfrica"
 ```
 
-An article in Bloomberg last week called *Hip Coffee at $4 a Cup Revives African Industry Left Behind* observed that the growing interest in niche, single-origin coffees is helping to revive the African coffee sector:
+An article in Bloomberg last week called `r htmltools::HTML("<a href = 'https://www.bloomberg.com/news/articles/2017-08-01/trendy-coffee-at-4-a-cup-revives-african-industry-left-behind-j5u6te3n' target = '_blank'>Hip Coffee at $4 a Cup Revives African Industry Left Behind</a>")` observed that the growing interest in niche, single-origin coffees is helping to revive the African coffee sector:
 
-> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")`Customers willing to pay a premium for African brews, known for their floral, fruity flavors, are driving purchases of coffee from the continent where the drink is ssaid to have originated. `r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")`
+> `r htmltools::HTML("<i class = 'fa fa-quote-left' aria-hidden = 'true'></i>")`  Customers willing to pay a premium for African brews, known for their floral, fruity flavors, are driving purchases of coffee from the continent where the drink is said to have originated. `r htmltools::HTML("<i class = 'fa fa-quote-right' aria-hidden = 'true'></i>")`
 
 This spurred a number of similar articles to make ever more optimistic claims like [Third Wave Coffee Could Keep Africa's Smaller Growers in Business](http://www.foodandwine.com/news/coffee-sales-african-economy), [African Coffee On The Rise Thanks To Specialty Coffee](http://sprudge.com/african-coffee-on-the-rise-thanks-to-specialty-coffee-124468.html) and, my personal favourite, [Hipster Demand for Fancy Coffee Is Really Helping Africa's Farmers](http://www.grubstreet.com/2017/08/report-african-coffee-industry-rebounding.html). 
 
 Before us fancy coffee drinkers get too self-congratulatory, it's worth looking at the situation in a little more detail. 
 
-### Background/Context/History etc
+### A little history
 
 As the Bloomberg article rightly points out, the African coffee sector has not been thriving in recent years. Total production this year was just over 16 million bags, little changed on its volume in 1990. At the same time, most other regions have increased their output, particularly countries in Asia. 
 
-If we go back further, we can see that the share of coffee exports originating in Africa have massively tailed off, from over a third of the world total in 1973, when 4 countries from Africa were among the world's top ten producers, to under 10% today. 
+If we go back further, we can see that the share of coffee exports originating from Africa have massively tailed off, from over a third of the world total in 1973, when 4 African countries were among the world's top ten producers, to under 10% today. 
 
 ```{r, include = FALSE}
 coffeestats::loadUSDA()
@@ -69,75 +69,168 @@ plot_ly(graph1, x = ~year, fill = "tozeroy") %>%
               line = list(color = blogColours[1], shape = "spline", smoothing = 0.7),
               fillcolor = paste0(blogColours[1], "1A"),
               text = ~paste0("(", year, ") Africa: ", round(AF, 1), "%"), hoverinfo = "text") %>% 
-   add_annotations(x = 0, y = -0.1, 
-                    xref = "paper", yref = "paper",
-                    showarrow = F,
-                    xanchor = "left", yanchor = "top",
-                    borderpad = 0, borderwidth = 0,
-                    font = list(size = 10),
-                    text = "<i>Source: USDA</i>") %>%
+   # add_annotations(x = 0, y = -0.1, 
+   #                  xref = "paper", yref = "paper",
+   #                  showarrow = F,
+   #                  xanchor = "left", yanchor = "top",
+   #                  borderpad = 0, borderwidth = 0,
+   #                  font = list(size = 10),
+   #                  text = "<i>Source: USDA</i>") %>%
     layout(
         title = "Share of world coffee exports by region",
         xaxis = list(title = "", showgrid = FALSE),
         yaxis = list(title = "%", zeroline = FALSE),
         font = list(color = "#515151", family = "'Noto Sans', verdana, arial"),
         titlefont = list(size = 15),
-        margin = list(l = 40, b = 50)
+        margin = list(l = 40, b = 50),
+        legend = list(orientation = "h", x = 1, y = 1, font = list(size = 10))
     )
 ```
 
-There are many reasons for this decline...
+There are many reasons for this decline; the 1980s and 1990s saw a global move towards deregulation and market liberalism, which resulted in the dismantling of state coffee institutions in many African producing countries. The collapse of the International Coffee Agreement in 1989 seemed to affect Africa more than any other producing region, with growth falling by an average of -0.6% per year since then. Logistical challenges have also affected production growth, with high transportation and production costs putting farmers at a disadvantage. 
 
 ### Situation today?
 
 Is the rise of specialty coffee really driving a resurgence in African coffee? One of the most successful producers is Uganda, who have nearly doubled production since 1990. But Uganda is mostly a Robusta producer, and unlikely to be selling to the specialty market. Output from Kenya, on other hand, is just half of its level 25 years ago, as are smaller Arabica producers like Burundi and Rwanda. 
 
-The strongest case for this argument might be Ethiopia... large increase in the 2000s, and a popular origin for specialty coffee.
-But - difficulties with ECX, large increase in domestic consumption (potential for others)?
+The strongest case for this argument might be Ethiopia, where production has jumped from 3 million bags in 2000 to over 6 million today, coinciding with the recent rise of specialty coffee. The inherent variety of indigenous Ethiopian coffee is also very appealing to fans of single-origin beans, and could provide a lucrative channel for further development. However, the prospects for Ethiopian coffee are worrying - recent studies suggest that up to 50% of the current coffee area could become intolerant for coffee as the climate changes. The introduction of the Ethiopian Commodity Exchange (ECX) in 2008 was met with some skepticism by the specialty coffee trade, making it harder to identify and trace small lots, though last month the Ethiopian government agreed to [improve its traceability on the Exchange](https://www.ft.com/content/020bc846-393a-11e7-821a-6027b8a20f23). This reform was specifically designed to target higher quality consumption markets.  
 
-```{r, message = FALSE, warning = FALSE}
+```{r, include = FALSE}
 coffeestats::loadICOhistorical()
-icoData %>% 
+top4 <- icoData %>% left_join(y = cont) %>% filter(series == "production", Continent == "AF") %>%
+    group_by(country) %>% summarise(value = sum(value, na.rm=T)) %>% top_n(n = 4, wt = value) %>% magrittr::extract2('country')
+graph2data <- icoData %>% 
     left_join(y = cont) %>% 
-    filter(series == "production", Continent == "AF") %>% 
-    group_by(country) %>% 
-    plot_ly(x = ~year, y = ~value, type = "bar", color = ~country) %>% 
-    layout(barmode = "stack")
-usda %>% 
-    left_join(y = cont) %>% 
-    filter(series == "Consumption", Continent == "AF", Type == "Exporting", year >= 1990) %>% 
-    group_by(country) %>% 
-    plot_ly(x = ~year, y = ~value, type = "bar", color = ~country) %>% 
-    layout(barmode = "stack")
+    filter(series == "production", Continent == "AF", year >= 2000) %>% 
+    mutate(country = forcats::fct_other(country, keep = top4, other_level = "Others")) %>% 
+    mutate(country = forcats::fct_rev(country),
+           value = value/1000) %>% 
+    group_by(country, year) %>% 
+    summarise(value = sum(value, na.rm = TRUE)) %>% 
+    ungroup() %>% 
+    spread(key = country, value = value)
+```
+```{r, out.width = "100%", out.height = "380px", echo = FALSE}
+plot_ly(graph2data, x = ~year) %>% 
+    add_bars(y = ~Others, name = "Others", 
+             marker = list(color = blogColours[5]), opacity = 0.6, 
+             text = ~paste0("(", year, ") Others: ", round(Others, 1), "m"),
+             hoverinfo = "text") %>% 
+    add_bars(y = ~Uganda, name = "Uganda", 
+             marker = list(color = blogColours[4]), opacity = 0.6, 
+             text = ~paste0("(", year, ") Uganda: ", round(Uganda, 1), "m"),
+             hoverinfo = "text") %>% 
+    add_bars(y = ~Kenya, name = "Kenya", 
+             marker = list(color = blogColours[3]), opacity = 0.6, 
+             text = ~paste0("(", year, ") Kenya: ", round(Kenya, 1), "m"),
+             hoverinfo = "text") %>% 
+    add_bars(y = ~Ethiopia, name = "Ethiopia", 
+             marker = list(color = blogColours[2]), opacity = 0.6, 
+             text = ~paste0("(", year, ") Ethiopia: ", round(Ethiopia, 1), "m"),
+             hoverinfo = "text")  %>% 
+    add_bars(y = ~`Cote d'Ivoire`, name = "Cote d'Ivoire", 
+             marker = list(color = blogColours[1]), opacity = 0.6, 
+             text = ~paste0("(", year, ") Cote d'Ivoire: ", round(`Cote d'Ivoire`, 1), "m"),
+             hoverinfo = "text") %>% 
+     # add_annotations(x = 0, y = -0.2, 
+     #                xref = "paper", yref = "paper",
+     #                showarrow = F,
+     #                xanchor = "left", yanchor = "top",
+     #                borderpad = 0, borderwidth = 0,
+     #                font = list(size = 10),
+     #                text = "<i>Source: ICO</i>") %>%
+    layout(
+        title = "Coffee production in Africa",
+        legend = list(orientation = "h"),
+        xaxis = list(title = "", showgrid = FALSE),
+        yaxis = list(title = "Million 60kg bags", zeroline = FALSE),
+        font = list(color = "#515151", family = "'Noto Sans', verdana, arial"),
+        titlefont = list(size = 15),
+        barmode = "stack",
+        margin = list(b = 80)
+        )
 ```
 
 ### Where do the benefits go?
 
-The increased interest in single-origin coffee might have the potential to raise demand for African coffee, but need to be careful becoming over-confident in ascribing any benefits from this. The fact remains that the vast majority of value in the coffee sector comes in the processing and retail of coffee, which mostly occurs in non-producing countries. The single largest exporter of roasted coffee in the world is Germany. In fact, according to customs data from Eurostat, the value of coffee exported by the European Union **to** Africa often exceeds that of coffee imported **from** Africa. 
+The increased interest in single-origin coffee might have the potential to raise demand for African coffee, but we need to be careful becoming over-confident in ascribing any benefits from this. The fact remains that the vast majority of value in the coffee sector comes in the processing and retail of coffee, which mostly occurs in non-producing countries. For example, looking at customs data on the coffee trade between the European Union and Africa shows a very different picture. Coffee imports from Africa are almost entirely green, unprocessed coffee. Exports back in the other direction, on the other hand, are mostly processed products, either roasted or soluble (instant) coffee. This trade imbalance affects the local market too - in many producing countries, it's not uncommon to be offered an imported cup of Nescafé rather than a local equivalent. 
 
-![euro-africa-graph](/img/euro-africa-graph.svg)
+```{r, include = FALSE}
+euroAf2 <- read_csv(file.path(coffeeAfrica, "euroAfrica2.csv"))
+euroAf2graph <- euroAf2 %>% 
+    mutate(year = stringr::str_sub(PERIOD, 11, 14),
+           value = as.numeric(stringr::str_replace_all(Value, ",", "")),
+           series = case_when(
+               stringr::str_detect(.$PRODUCT, "^09011") ~ "Green",
+               stringr::str_detect(.$PRODUCT, "^09012") ~ "Roasted",
+               stringr::str_detect(.$PRODUCT, "^2101")  ~ "Soluble",
+               TRUE ~ "NA")) %>% 
+    filter(series != "NA") %>% 
+    group_by(series, FLOW, year) %>% 
+    summarise(total = sum(value, na.rm=T)/1000000) %>% ungroup() %>% 
+    na.omit() %>% 
+    spread(key = FLOW, value = total)
+p1exp <- euroAf2graph %>% 
+    select(series, year, EXPORT) %>% 
+    spread(key = series, value = EXPORT) %>% 
+    mutate(g = Green, r = Green + Roasted, s = Green + Roasted + Soluble)
+p2imp <- euroAf2graph %>% 
+    select(series, year, IMPORT) %>% 
+    spread(key = series, value = IMPORT) %>% 
+    mutate(g = Green, r = Green + Roasted, s = Green + Roasted + Soluble)
+p1 <- plot_ly(p1exp, x = ~year, y = ~g, name = "Green", type = "scatter", mode = "lines", fill = "tozeroy", 
+              line = list(color = blogColours[4]), showlegend = TRUE,
+              text = ~paste0("(", year, ") Green: €", round(Green, 1), "m"), hoverinfo = "text") %>% 
+    add_trace(x = ~year, y = ~r, name = "Roasted", 
+              type = "scatter", mode = "lines", fill = "tonexty", line = list(color = blogColours[2]),
+              text = ~paste0("(", year, ") Roasted: €", round(Roasted, 1), "m"), hoverinfo = "text") %>% 
+    add_trace(
+        x = ~year, y = ~s, type = "scatter", name = "Soluble",
+        mode = "lines", fill = "tonexty", line = list(color = blogColours[3]),
+        text = ~paste0("(", year, ") Soluble: €", round(Soluble, 1), "m"), hoverinfo = "text"
+    ) %>% 
+    add_annotations(x = 0, y = 110, 
+                    xref = "x1", yref = "y1",
+                    showarrow = F,
+                    xanchor = "left", yanchor = "top",
+                    bgcolor = "#FFFFFF", borderwidth = 1, bordercolor = "#515151", borderpad = 5,
+                    font = list(color = "#515151", family = "'Noto Sans', verdana, arial", size = 13),
+                    text = "Exports to Africa")
+p2 <- plot_ly(p2imp, x = ~year, y = ~g, name = "Green", type = "scatter", mode = "lines", fill = "tozeroy", 
+              line = list(color = blogColours[4]), showlegend = FALSE,
+              text = ~paste0("(", year, ") Green: €", round(Green, 1), "m"), hoverinfo = "text") %>% 
+    add_trace(x = ~year, y = ~r, name = "Roasted", 
+              type = "scatter", mode = "lines", fill = "tonexty", line = list(color = blogColours[2]),
+              text = ~paste0("(", year, ") Roasted: €", round(Roasted, 1), "m"), hoverinfo = "text") %>% 
+    add_trace(
+        x = ~year, y = ~s, type = "scatter", name = "Soluble",
+        mode = "lines", fill = "tonexty", line = list(color = blogColours[3]),
+        text = ~paste0("(", year, ") Soluble: €", round(Soluble, 1), "m"), hoverinfo = "text"
+    ) %>% 
+    add_annotations(x = 0, y = 1100, 
+                    xref = "x2", yref = "y2",
+                    showarrow = F,
+                    xanchor = "left", yanchor = "top",
+                    bgcolor = "#FFFFFF", borderwidth = 1, bordercolor = "#515151", borderpad = 5,
+                    font = list(color = "#515151", family = "'Noto Sans', verdana, arial", size = 13),
+                    text = "Imports from Africa")
 
-```{r, eval = FALSE}
-source("~/R/tomcopple.github.io/scripts/theme_blog.R")
-
-euroAfGraph <- read_csv(file.path(coffeeAfrica, "euroAfGraph.csv"))
-ggplot(euroAfGraph, aes(x = PERIOD)) +
-    geom_line(aes(y = Y, group = SERIES, color = SERIES)) +
-    geom_ribbon(aes(ymin = YMIN, ymax = YMAX, group = SERIES, fill = SERIES), show.legend = FALSE, alpha = 0.5) +
-    scale_color_manual("", values = blogColours, labels = c("Exports", "Imports")) +
-    scale_fill_manual("", values = blogColours) +
-    theme_blog() +
-    labs(title = "Value of coffee traded between EU and Africa", x = NULL, y = "Million €") +
-    theme(legend.key = element_blank(),
-          text = element_text(family = "Noto Sans", color = "#515151"))
-# svg(file.path(coffeeAfrica, "euroAfGraph.svg"), width = 15, height = 7)
-# dev.off()
 ```
-
+```{r, echo = FALSE, out.width = "100%", out.height = "380px"}
+subplot(p1, p2, margin = 0.05, nrows = 1, shareY = FALSE, shareX = FALSE) %>% 
+    layout(
+        title = "Coffee trade between EU & Africa (€)",
+        xaxis = list(title = "", showgrid = FALSE, nticks = 3),
+        xaxis2 = list(title = "", showgrid = FALSE, nticks = 3),
+        yaxis = list(title = "Million €", zeroline = FALSE),
+        yaxis2 = list(title = "", zeroline = FALSE),
+        legend = list(orientation = "h", x = 0.5, xanchor = "center"),            
+        font = list(color = "#515151", family = "'Noto Sans', verdana, arial"),
+        titlefont = list(size = 15),
+        margin = list(b = 80)
+    )
+```
 
 ### Conclusions
 
-*  Specialty coffee won't save African production if all the value is captured in importing countries. 
-*  Opportunity for exports to rise, but doesn't seem to be happening yet?
-*  Any chance of domestic consumption increasing to provide alternative market?
-
+While specialty coffee might offer the potential for a revival in African coffee production, it's far from certain that this is going to happen. The challenges and declines in countries like Kenya are still present, while even high-performing origins like Ethiopia are facing significant obstacles in the future. While the opportunity might be there, it's a little premature to take it for granted. 
