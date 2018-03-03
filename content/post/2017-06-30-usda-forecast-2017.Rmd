@@ -7,7 +7,7 @@ categories: [Blog]
 tags: [Coffee]
 draft: false
 thumbnail: 'usdaForecast2017.png'
-summaryText: <p>Last week, the United States Department of Agriculture (USDA) released their twice-yearly estimate of global supply and demand of coffee. This estimate contains a forecast for the upcoming 2017/18 coffee year, which starts in October, giving us an indication of where the coffee sector might be going up to September 2018.<p>Obviously, much can change in that time, particularly as weather events become more unpredictable, but there are still some useful morsels to be found in the data.<p><a href="http://tomcopple.coffee/2017/06/30/usda-forecast-2017/"><img src="/img/coffee-stocks.png" alt="a stock photo of some coffee stocks" title="a stock photo of coffee stocks"/></a><p>
+summaryText: <p>Last week, the United States Department of Agriculture (USDA) released their twice-yearly estimate of global supply and demand of coffee. This estimate contains a forecast for the upcoming 2017/18 coffee year, which starts in October, giving us an indication of where the coffee sector might be going up to September 2018.<p>Obviously, much can change in that time, particularly as weather events become more unpredictable, but there are still some useful morsels to be found in the data.<p><a href="https://tomcopple.github.io/2017/06/30/usda-forecast-2017/"><img src="/img/coffee-stocks.png" alt="a stock photo of some coffee stocks" title="a stock photo of coffee stocks"/></a><p>
 ---
 
 ```{r setup, include=FALSE}

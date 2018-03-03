@@ -7,7 +7,7 @@ thumbnail: coffeeChina.png
 categories: [Blog]
 tags: [Coffee]
 draft: false
-summaryText: <p>China might not be the first country you think of when it comes to coffee, but its influence is growing. It's no surprise that as China develops it's drinking more coffee, but its potential to be one of the world's major producers is less well known. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. </p><p><a href="http://tomcopple.coffee/2017/07/14/coffee-china/"><img src="/img/coffeeChinaBanner.png" alt="coffee-china-banner" title="Could China change the way we think about coffee?"/></a><p>
+summaryText: <p>China might not be the first country you think of when it comes to coffee, but its influence is growing. It's no surprise that as China develops it's drinking more coffee, but its potential to be one of the world's major producers is less well known. China is rapidly becoming a force on the global coffee economy, but we don't seem to know much about it. </p><p><a href="https://tomcopple.github.io/2017/07/14/coffee-china/"><img src="/img/coffeeChinaBanner.png" alt="coffee-china-banner" title="Could China change the way we think about coffee?"/></a><p>
 ---
 
 ```{r setup, include = FALSE}
