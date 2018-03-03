@@ -33,19 +33,18 @@ If we go back further, we can see that the share of coffee exports originating f
 
 ```{r, include = FALSE}
 coffeestats::loadUSDA()
-cont <- read_csv(file.path(coffeestats, "country-list.csv")) %>% 
-    rename(country = Country)
+cont <- read_csv(file.path(coffeestats, "country-list.csv"))
 
 graph1 <- usda %>% 
     left_join(y = cont) %>% 
     na.omit() %>% 
-    filter(series == "Exports", value != 0, Type == "Exporting") %>% 
-    group_by(Continent, year) %>% 
+    filter(series == "Exports", value != 0, type == "Exporting") %>% 
+    group_by(continent, year) %>% 
     summarise(value = sum(value, na.rm = TRUE)) %>% 
     group_by(year) %>% 
     mutate(perc = 100*value/sum(value, na.rm = TRUE)) %>% 
     select(-value) %>% 
-    spread(key = Continent, value = perc, fill = 0) %>% 
+    spread(key = continent, value = perc, fill = 0) %>% 
     ungroup()
 ```
 ```{r, out.width = "100%", out.height = "380px", echo = FALSE}
@@ -97,11 +96,11 @@ The strongest case for this argument might be Ethiopia, where production has jum
 
 ```{r, include = FALSE}
 coffeestats::loadICOhistorical()
-top4 <- icoData %>% left_join(y = cont) %>% filter(series == "production", Continent == "AF") %>%
+top4 <- icoData %>% left_join(y = cont) %>% filter(series == "production", continent == "AF") %>%
     group_by(country) %>% summarise(value = sum(value, na.rm=T)) %>% top_n(n = 4, wt = value) %>% magrittr::extract2('country')
 graph2data <- icoData %>% 
     left_join(y = cont) %>% 
-    filter(series == "production", Continent == "AF", year >= 2000) %>% 
+    filter(series == "production", continent == "AF", year >= 2000) %>% 
     mutate(country = forcats::fct_other(country, keep = top4, other_level = "Others")) %>% 
     mutate(country = forcats::fct_rev(country),
            value = value/1000) %>% 

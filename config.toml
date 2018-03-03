@@ -1,4 +1,4 @@
-baseurl = "http://tomcopple.coffee/"
+baseurl = "https://tomcopple.github.io/"
 relativeurls = true
 languageCode = "en-us"
 buildDrafts = false
