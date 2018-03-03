@@ -137,7 +137,7 @@ stocksUse <- usda %>%
     mutate(Consumption = Consumption / 52,
            stocks_use = `Opening Stocks` / Consumption,
            year = lubridate::dmy(paste0("01-10-", year)))
-coffeestats::getFuturePrices(F)
+getFuturePrices(F)
 
 ```
 ```{r, echo = FALSE, out.width="100%", out.height = "380px"}
